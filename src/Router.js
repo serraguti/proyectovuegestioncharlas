@@ -12,6 +12,7 @@ import AdminGestionUsuariosComponent from "@/components/AdminGestionUsuariosComp
 import NotFoundComponent from "./components/NotFoundComponent.vue";
 import AlumnosCursoProfesorComponent from "@/components/AlumnosCursoProfesorComponent";
 import CharlasDetalleComponent from "@/components/CharlasDetalleComponent";
+import SeleccionRondasProfesor from "@/components/SeleccionRondasProfesor";
 
 const routes = [
     {
@@ -127,6 +128,19 @@ const routes = [
         path: '/perfilprofesor/alumnos',
         name: 'alumnos',
         component: AlumnosCursoProfesorComponent,
+        beforeEnter: (to, from, next) => {
+            const token = Cookies.get('bearer_token');
+            if (token) {
+                next();
+            } else {
+                next('/login');
+            }
+        }
+    },
+    {
+        path: '/rondasprofesor',
+        name: 'rondasprofesor',
+        component: SeleccionRondasProfesor,
         beforeEnter: (to, from, next) => {
             const token = Cookies.get('bearer_token');
             if (token) {

@@ -1,463 +1,299 @@
 <template>
-<h1>Hola mundo</h1>
+<div>
+    <i class="arrow-icon fa fa-arrow-left ml-10 mt-10"></i>
+        <h1
+            class="text-3xl font-extrabold text-center ">
+            Ronda <span class="font-extrabold">{{ idRonda }}</span>
+        </h1>
+        <p class="text-center mb-0">Curso {{charlasPropuestas[0].idCurso}}</p>
+    <br>
+    <br>
+    <div class="grid grid-cols-2 gap-2 ">
+        <!-- Charlas Propuestas -->
+        <mat-card class="p-4 shadow-md border border-gray-200">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold">Charlas Propuestas</h2>
+                <div class="flex items-center space-x-2 bg-blue-200 text-blue-800 px-4 py-2 rounded-full">
+                    <span class="font-bold">Votos Totales</span>
+                    <span class="font-semibold text-xl">{{ votosPropuestos }} / {{ totalVotos }}</span>
+                </div>
+            </div>
+            <mat-card-content class="scrollable-content" 
+            @dragover="onDragOver($event)"
+                @drop="onDrop($event, 'propuestas')">
+                <div v-for="charla in charlasPropuestas" 
+                :key="charla.idCharla"
+                    class="draggable-item flex items-center p-4 bg-gray-100 shadow-md rounded-lg mb-4" draggable="true"
+                    @click="onDragStart($event, charla)">
+                    <img src="charla.imagenCharla"  
+                    onerror="this.src='https://cdn-icons-png.freepik.com/512/3415/3415488.png'" alt="Imagen Charla" class="w-16 h-16 object-cover rounded-full mr-4" />
+                    <div class="flex justify-between w-full">
+                        <div>
+                            <h3 class="text-lg font-bold">{{ charla.titulo }}</h3>
+                            <div class="flex items-center space-x-2">
+                                <div class="flex items-center space-x-2">
+                                  <span v-if="charla.idEstadoCharla == 1"
+                                   class="px-2 py-1 text-xs font-medium rounded-full bg-gray-200 text-gray-800">
+                                        {{ charla.idEstadoCharla === 1 ? 'Propuesta' : charla.idEstadoCharla === 2 ?
+                                        'Aceptada' : '' }}
+                                  </span>
+                                  <span v-if="charla.idEstadoCharla == 2"
+                                   class="px-2 py-1 text-xs font-medium rounded-full bg-green-200 text-green-800">
+                                        {{ charla.idEstadoCharla === 1 ? 'Propuesta' : charla.idEstadoCharla === 2 ?
+                                        'Aceptada' : '' }}
+                                  </span>                                  
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-200 text-blue-800">
+                                        Votos: {{charla.votos}}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Charlas Aceptadas -->
+        <mat-card class="p-4 shadow-md border border-gray-200">
+            <h2 class="text-xl font-semibold mb-4">Charlas Aceptadas</h2>
+            <mat-card-content class="scrollable-content" 
+            @dragover="onDragOver($event)"
+                @drop="onDrop($event, 'aceptadas')">
+                <div
+                    class="draggable-item flex items-center p-6 bg-gray-50 shadow-md rounded-lg mb-6 text-center cursor-pointer border-dashed border-2 border-blue-300">
+                    <i class="fas fa-plus text-4xl text-gray-500"></i>
+                    <p class="text-gray-600 ml-4">Arrastra aquí una charla para poder aceptarla</p>
+                </div>
+                <div 
+                    v-for="charla in charlasAceptadas" 
+                    :key="charla.idCharla"
+                    class="relative draggable-item flex items-center p-4 bg-gray-100 shadow-md rounded-lg mb-4"
+                    draggable="true" @dragstart="onDragStart($event, charla)">
+
+                    <div v-if="charla.idEstadoCharla === 2" 
+                    class="absolute top-0 right-0 mt-2 mr-2 text-yellow-500">
+                        <i class="fas fa-crown text-3xl"></i>
+                    </div>
+    
+                    <img src="charla.imagenCharla" alt="Imagen Charla" onerror="this.src='https://cdn-icons-png.freepik.com/512/3415/3415488.png'" class="w-16 h-16 object-cover rounded-full mr-4" />
+                    <div class="flex justify-between w-full">
+                        <div>
+                            <h3 class="text-lg font-bold">{{ charla.titulo }}</h3>
+                            <div class="flex items-center space-x-2">
+                                <div class="flex items-center space-x-2">
+                                  <span v-if="charla.idEstadoCharla == 1"
+                                   class="px-2 py-1 text-xs font-medium rounded-full bg-gray-200 text-gray-800">
+                                        {{ charla.idEstadoCharla === 1 ? 'Propuesta' : charla.idEstadoCharla === 2 ?
+                                        'Aceptada' : '' }}
+                                  </span>
+                                  <span v-if="charla.idEstadoCharla == 2"
+                                   class="px-2 py-1 text-xs font-medium rounded-full bg-green-200 text-green-800">
+                                        {{ charla.idEstadoCharla === 1 ? 'Propuesta' : charla.idEstadoCharla === 2 ?
+                                        'Aceptada' : '' }}
+                                  </span>   
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-200 text-blue-800">
+                                        Votos: {{charla.votos}}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+    <!-- Botones para guardar y cancelar -->
+    <div class="grid grid-cols-2 gap-4 mt-4">
+        <!-- Cancelar cambios -->
+        <button mat-raised-button color="warn" @click="abrirConfirmacionCancelar()"
+            class=" button-cancel p-4 shadow-md border-gray-200">
+            Cancelar cambios
+        </button>
+
+        <!-- Guardar cambios -->
+        <button mat-raised-button color="primary" @click="abrirConfirmacionGuardar()"
+            class="p-4 shadow-md border-gray-200">
+            Guardar cambios
+        </button>
+    </div>
+
+    <!-- Popup de confirmación -->
+    <div v-if="mostrarPopup" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <h3 class="text-xl font-semibold mb-4">{{ mensajePopup }}</h3>
+            <div class="flex justify-between">
+                <button @click="confirmarAccion()"
+                    class="bg-blue-500 text-white px-4 py-2 rounded-md">Confirmar</button>
+                <button @click="cerrarPopup()" class="bg-red-500 text-white px-4 py-2 rounded-md">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
 </template>
 <script>
 import PerfilService from "@/services/PerfilService";
-import Swal from "sweetalert2";
+import CharlasService from "@/services/CharlasService";
+//import Swal from "sweetalert2";
 
 export default {
   name: "SeleccionRondasProfesor",
   data() {
     return {
       usuario: null,
-      rondas: [],
-      alumnos: [],
-      cursos: [],
-      seccionActiva: null, // 'rondas' o 'alumnos'
+      idRonda: 1,
+      idCurso: 3213,
+      charlasPropuestas: [],
+      charlasAceptadas: [],
+      draggedCharla: null,
+      // Variables para el popup
+      mostrarPopup: false,
+      mensajePopup: '',
+      votosPropuestos: 0, // Total de votos de las charlas propuestas
+      totalVotos: 0, // Total de votos posibles
       perfilService: new PerfilService(),
+      charlasService: new CharlasService(),
       cargando: false,
     };
   },
   methods: {
-    mostrarFormularioContrasena() {
-      Swal.fire({
-        title: "Editar Contraseña",
-        html: ` 
-      <div class="form-group">
-        <input type="password" id="contraseniaNueva" class="form-control" placeholder="Contraseña Nueva">
-      </div>
-    `,
-        focusConfirm: false,
-        showCancelButton: true,
-        customClass: {
-          popup: "swal-popup-bootstrap",
-          title: "swal-title-bootstrap",
-          input: "swal-input-bootstrap",
-          confirmButton: "swal-confirm-btn",
-          cancelButton: "swal-cancel-btn",
-        },
-        preConfirm: async () => {
-          const contraseniaNueva =
-            Swal.getPopup().querySelector("#contraseniaNueva").value;
+  async cargarAlumnos() {
+    const alumnosPorCurso = await this.perfilService.getAlumnosActivoProfesor();
+    //this.idCurso = this.charlasPropuestas[0].idCurso
+    // Buscamos el curso que coincide con el idCurso de la ruta
+    console.log("Antes del error");
+    const curso = alumnosPorCurso.find(curso => curso.curso.idCurso === this.idCurso);
+    console.log(curso);
+    //this.idCurso = this.charlasPropuestas[0].idCurso
 
-          // Validación de la contraseña: debe tener entre 8 y 20 caracteres, letras y números, y sin caracteres especiales ni espacios
-          const regex =
-            /^(?=.*[a-zA-Z])(?=.*\d)(?!.*\s)(?!.*[^a-zA-Z0-9]).{8,20}$/;
+    // Si encontramos el curso, asignamos el número de alumnos
+    if (curso) {
+        this.totalVotos = curso.numeroAlumnos;  // Correctamente asignamos el número de alumnos
+    } else {
+      this.totalVotos = 0;
+    }
+  },
+  async cargarCharlas() {
+    try {
+      this.cargando = true;
+      // const charlas = await this.perfilService.getCharlasRonda(this.idRonda);
+      const charlas = await this.charlasService.getCharlasRonda(this.idRonda);
+      this.charlasPropuestas = charlas.filter((charla) => charla.idEstadoCharla === 1);
+      this.charlasAceptadas = charlas.filter((charla) => charla.idEstadoCharla === 2);
 
-          if (!contraseniaNueva) {
-            Swal.showValidationMessage(
-              "Por favor, llena el campo de la nueva contraseña"
-            );
-            return false;
-          }
-
-          if (!regex.test(contraseniaNueva)) {
-            Swal.showValidationMessage(
-              "La contraseña debe tener entre 8 y 20 caracteres, incluir letras y números, y no contener espacios ni caracteres especiales"
-            );
-            return false;
-          }
-
-          try {
-            await this.perfilService.updateContrasenia(contraseniaNueva);
-            Swal.fire("Éxito", "Contraseña actualizada con éxito", "success");
-          } catch (error) {
-            console.error("Error al actualizar la contraseña:", error);
-            Swal.fire("Error", "No se pudo actualizar la contraseña.", "error");
-          }
-        },
-      });
-    },
-    async modificarEstadoCurso(curso) {
-      try {
-        // Mostrar la alerta de confirmación antes de cambiar el estado
-        const result = await Swal.fire({
-          title: "¿Estás seguro?",
-          text: `¿Deseas cambiar el estado del curso a ${
-            curso.activo ? "inactivo" : "activo"
-          }?`,
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonText: "Sí, cambiar",
-          cancelButtonText: "Cancelar",
-        });
-
-        if (!result.isConfirmed) return;
-
-        // Mostrar Swal con spinner mientras se ejecutan los métodos
-        Swal.fire({
-          title: "Actualizando...",
-          text: "Por favor, espera.",
-          allowOutsideClick: false,
-          didOpen: () => {
-            Swal.showLoading();
-          },
-        });
-
-        const cursosData = await this.perfilService.getAlumnosCursoProfesor();
-        const hayCursoActivo = cursosData.some((c) => c.curso.activo);
-
-        if (!curso.activo && hayCursoActivo) {
-          Swal.fire(
-            "Error",
-            "Ya existe un curso activo. Debes desactivarlo primero.",
-            "warning"
-          );
-          return;
-        }
-
-        const nuevoEstado = !curso.activo;
-        await this.perfilService.updateEstadoCurso(curso.idCurso, nuevoEstado);
-
-        Swal.fire(
-          "Éxito",
-          "El estado del curso ha sido actualizado.",
-          "success"
-        );
-
-        this.cargarCursos();
-      } catch (error) {
-        console.error("Error al modificar el estado del curso:", error);
-        Swal.fire(
-          "Error",
-          "No se pudo actualizar el estado del curso.",
-          "error"
-        );
+      // Procesar votos para charlas propuestas
+      for (const charla of this.charlasPropuestas) {
+        const charlaConVotos = await this.perfilService.getVotosCharla(charla.idCharla);
+        charla.votos = charlaConVotos.votos ?? 0;
+        this.votosPropuestos += charla.votos; 
       }
-    },
-    async eliminarCurso(idCurso) {
-      try {
-        // Mostrar una alerta de confirmación antes de eliminar
-        const result = await Swal.fire({
-          title: "¿Estás seguro?",
-          text: "Este curso será eliminado permanentemente.",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonText: "Sí, eliminar",
-          cancelButtonText: "Cancelar",
-        });
+      
+      this.charlasPropuestas.sort((a, b) => b.votos - a.votos);
 
-        if (result.isConfirmed) {
-          // Realizar la solicitud DELETE al servidor
-          await this.perfilService.eliminarCurso(idCurso);
-          // Actualizar la lista de cursos
-          this.cargarCursos();
-          Swal.fire(
-            "¡Eliminado!",
-            "El curso ha sido eliminado con éxito.",
-            "success"
-          );
-        }
-      } catch (error) {
-        console.error("Error al eliminar el curso:", error);
-        Swal.fire(
-          "Error",
-          "No se pudo eliminar el curso. Inténtalo más tarde.",
-          "error"
-        );
+      // Procesar votos para charlas aceptadas
+      for (const charla of this.charlasAceptadas) {
+        const charlaConVotos = await this.perfilService.getVotosCharla(charla.idCharla);
+        charla.votos = charlaConVotos.votos ?? 0;
+        this.votosPropuestos += charla.votos; 
       }
-    },
-    async abrirModalCrearCurso() {
-      const { value: formValues, isConfirmed } = await Swal.fire({
-        title: "Crear Curso",
-        html:
-          '<input id="idCurso" class="swal2-input" placeholder="ID curso">' +
-          '<input id="nombre" class="swal2-input" placeholder="Nombre curso">' +
-          '<input id="fechaInicio" type="date" class="swal2-input" placeholder="Fecha de inicio">' +
-          '<input id="fechaFin" type="date" class="swal2-input" placeholder="Fecha de fin">',
-        focusConfirm: false,
-        showCancelButton: true, // Mostrar el botón de cancelar
-        confirmButtonText: "Crear", // Cambiar texto del botón "Confirmar"
-        cancelButtonText: "Cancelar", // Cambiar texto del botón "Cancelar"
-        preConfirm: () => {
-          const idCurso = parseInt(document.getElementById("idCurso").value); // Permite un ID vacío que se pone como 0 por defecto
-          const nombre = document.getElementById("nombre").value;
-          const fechaInicio = document.getElementById("fechaInicio").value;
-          const fechaFin = document.getElementById("fechaFin").value;
-          if (!nombre || !fechaInicio || !fechaFin) {
-            Swal.showValidationMessage("Todos los campos son obligatorios");
-            return;
-          }
-          return { idCurso, nombre, fechaInicio, fechaFin }; // Retornamos el objeto completo
-        },
-      });
-
-      if (isConfirmed && formValues) {
-        try {
-          // Convertir las fechas a formato ISO
-          const fechaInicioISO = new Date(formValues.fechaInicio).toISOString();
-          const fechaFinISO = new Date(formValues.fechaFin).toISOString();
-
-          // Obtener la lista de cursos antes de crear uno nuevo
-          const cursosData = await this.perfilService.getAlumnosCursoProfesor();
-          console.log("Cursos obtenidos:", cursosData);
-
-          // Verificar si hay un curso activo
-          const hayCursoActivo = cursosData.some((curso) => curso.curso.activo);
-
-          // Determinar si el nuevo curso será activo o inactivo
-          const activo = !hayCursoActivo; // Será activo solo si no hay otro curso activo
-          console.log("¿Hay un curso activo?", hayCursoActivo);
-
-          // Pasar el formulario completo al método crearCurso
-          const cursoData = {
-            idCurso: formValues.idCurso, // Ahora tomamos el ID ingresado
-            nombre: formValues.nombre, // nombre
-            fechaInicio: fechaInicioISO, // fechaInicio
-            fechaFin: fechaFinISO, // fechaFin
-            activo: activo, // activo
-          };
-
-          // Llamar a crearCurso pasando el objeto completo y esperar la respuesta
-          await this.perfilService.crearCurso(cursoData);
-
-          Swal.fire("Éxito", "Curso creado correctamente", "success");
-          this.cargarCursos(); // Recargar lista de cursos con el nuevo curso
-        } catch (error) {
-          console.error("Error al crear el curso:", error);
-          Swal.fire(
-            "Error",
-            error.message || "No se pudo crear el curso",
-            "error"
-          );
-        }
-      } else if (!isConfirmed) {
-        console.log("El usuario canceló la creación del curso.");
-      }
-    },
-
-    async verAlumnos(idCurso, activo) {
-      try {
-        this.cargando = true; // Mostrar spinner
-        let data;
-
-        // Si el curso está activo, filtrar por ID del curso
-        if (activo) {
-          // Si el curso no está activo, realiza la consulta directamente por ID
-          data = await this.perfilService.getAlumnosCursoActivoProfesor(
-            idCurso
-          );
-        } else {
-          // const cursosData = await this.perfilService.getAlumnosCursoProfesor();
-          // data = cursosData.find((curso) => curso.curso.idCurso === idCurso);
-          // Si el curso no está activo, usa el método para cursos inactivos (historial)
-          console.log("Hola");
-          data = await this.perfilService.getAlumnosCursoHistorialProfesor(
-            idCurso
-          );
-        }
-
-        if (data && data.alumnos && data.alumnos.length > 0) {
-          this.alumnos = data.alumnos; // Almacena los alumnos del curso seleccionado
-          this.$router.push(`/perfilprofesor/alumnos?idCurso=${idCurso}&activo=${activo}`);
-        } else {
-          Swal.fire({
-            icon: "warning",
-            title: "Sin datos",
-            text: "No se encontraron alumnos para el curso seleccionado.",
-          });
-        }
-      } catch (error) {
-        console.error("Error al cargar los alumnos:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Hubo un problema al cargar los datos. Inténtalo de nuevo.",
-        });
-      } finally {
-        this.cargando = false; // Ocultar spinner
-      }
-    },
-    mostrarDetalles() {
-      Swal.fire({
-        title: "Detalles del Usuario", // Título del SweetAlert
-        html: `
-        <div style="text-align: left;">
-          <strong>Nombre:</strong> ${this.usuario.nombre} <br>
-          <strong>Apellidos:</strong> ${this.usuario.apellidos} <br>
-          <strong>Email:</strong> ${this.usuario.email} <br>
-          <strong>Curso Actual:</strong> ${this.usuario.curso} <br>
-          <strong>Estado:</strong> ${
-            this.usuario.estadoUsuario ? "Activo" : "Inactivo"
-          } <br>
-          </div>
-        `,
-        icon: "info", // Tipo de ícono (puedes cambiarlo por otro si lo deseas)
-        confirmButtonText: "Cerrar", // Botón para cerrar el alert
-      });
-    },
-    async cargarPerfil() {
-      try {
-        const data = await this.perfilService.getUsuarioPerfil();
-        this.usuario = data.usuario; // Guardamos los datos del usuario en el estado
-        this.editedUsuario = { ...this.usuario }; // Inicializamos editedUsuario
-      } catch (error) {
-        console.error("Error al cargar el perfil:", error);
-        alert("No se pudo cargar la información del perfil.");
-      }
-    },
-    cancelarEdicion() {
-      this.editMode = false; // Cancelar edición
-      this.editedUsuario = { ...this.usuario }; // Revertir cambios no guardados
-    },
-    triggerFileInput() {
-      this.$refs.fileInput.click();
-    },
-    async handleFileChange(event) {
-      const file = event.target.files[0];
-      if (!file) return; // Si no se seleccionó archivo, salir
-      try {
-        const base64Content = await this.convertFileToBase64(file);
-        await this.perfilService.uploadUserImage(
-          this.usuario.idUsuario,
-          file.name,
-          base64Content
-        );
-        this.usuario.imagen = URL.createObjectURL(file); // Actualiza la imagen mostrada
-      } catch (error) {
-        console.error("Error al subir la imagen:", error);
-        alert("No se pudo subir la imagen. Inténtalo de nuevo.");
-      }
-    },
-    convertFileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result.split(",")[1]); // Solo el contenido base64
-        reader.onerror = (error) => reject(error);
-        reader.readAsDataURL(file);
-      });
-    },
-    async mostrarRondas() {
-      try {
-        this.seccionActiva = "rondas";
-        this.cargando = true;
-        const data = await this.perfilService.getRondasProfesor();
-        this.rondas = data;
-      } catch (error) {
-        console.error("Error al cargar las rondas:", error);
-        alert("No se pudieron cargar las rondas.");
-      } finally {
-        this.cargando = false; // Ocultar spinner
-      }
-    },
-    async cargarCursos() {
-      try {
-        this.cargando = true;
-        const cursosData = await this.perfilService.getAlumnosCursoProfesor(); // Obtener todos los cursos
-        console.log("Cursos obtenidos:", cursosData);
-
-        // Ahora se filtrarán los cursos activos o inactivos, dependiendo de su estado
-        this.cursos = await Promise.all(
-          cursosData.map(async (cursoData) => {
-            let alumnos = [];
-
-            // Verifica si el curso está activo
-            if (cursoData.curso.activo) {
-              // Si está activo, se usa el método para obtener los alumnos del curso activo
-              alumnos = await this.perfilService.getAlumnosCursoActivoProfesor(
-                cursoData.curso.idCurso
-              );
-              console.log(
-                `Alumnos del curso activo ${cursoData.curso.nombre}:`,
-                alumnos
-              );
-            } else {
-              // Si está inactivo, se usa el método para obtener el historial de alumnos
-              alumnos =
-                await this.perfilService.getAlumnosCursoHistorialProfesor(
-                  cursoData.curso.idCurso
-                );
-              console.log(
-                `Alumnos del curso inactivo ${cursoData.curso.nombre}:`,
-                alumnos
-              );
-            }
-
-            return {
-              curso: cursoData.curso,
-              numeroAlumnos: alumnos.numeroAlumnos, // Asegúrate de que la longitud no sea undefined
-              alumnos: alumnos,
-            };
-
-            
-          })
-        );
-
-        // Asegurarse de que los cursos se asignen correctamente después de la carga
-        console.log("Cursos con alumnos cargados:", this.cursos);
-      } catch (error) {
+      this.charlasAceptadas.sort((a, b) => b.votos - a.votos);
+         } catch (error) {
         console.error("Error al cargar los cursos:", error);
         alert("No se pudieron cargar los cursos.");
       } finally {
         this.cargando = false; // Desactiva el spinner
       }
-    },
-    async mostrarAlumnos() {
-      try {
-        this.seccionActiva = "alumnos";
-        this.cargando = true;
-        const data = await this.perfilService.getAlumnosCursoProfesor();
-        // Si 'data' es un array de cursos con sus alumnos
-        // Filtrar solo alumnos con estadoUsuario activo
-        this.alumnos =
-          data.length > 0
-            ? data[0].alumnos.filter(
-                (alumno) => alumno.alumno.estadoUsuario == true
-              )
-            : [];
-      } catch (error) {
-        console.error("Error al cargar los alumnos:", error);
-        alert("No se pudieron cargar los alumnos.");
-      } finally {
-        this.cargando = false; // Ocultar spinner
-      }
-    },
-    abrirAlerta(alumno) {
-      if (alumno.estadoUsuario == true) {
-        Swal.fire({
-          title: "¿Estás seguro?",
-          text: `Estás a punto de desactivar al usuario "${alumno.usuario}"`,
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonText: "Sí, cambiar",
-          cancelButtonText: "Cancelar",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.cambiarEstadoAlumno(alumno);
-          }
-        });
-      }
-    },
-    async cambiarEstadoAlumno(alumno) {
-      if (alumno.estadoUsuario == true) {
-        try {
-          // Realizar la eliminación en el servidor
-          await this.perfilService.updateEstadoUsuario(
-            alumno.idUsuario,
-            !alumno.estadoUsuario
-          );
-          Swal.fire(
-            "Estado cambiado",
-            `El usuario "${alumno.usuario}" ha sido desactivado correctamente. Ahora no podrá acceder al sistema.`,
-            "success"
-          );
-          await this.mostrarAlumnos();
-        } catch (error) {
-          console.error("Error al eliminar el alumno:", error);
-          Swal.fire(
-            "Error en la Operación",
-            "No se pudo desactivar al usuario. Por favor, inténtalo más tarde.",
-            "error"
-          );
+  },  
+  abrirConfirmacionGuardar(){
+    this.mostrarPopup = true;
+    this.mensajePopup = '¿Está seguro de que desea guardar los cambios?';
+  },
+    abrirConfirmacionCancelar() {
+    this.mostrarPopup = true;
+    this.mensajePopup = '¿Está seguro de que desea cancelar los cambios?';
+  },  
+  confirmarAccion()
+   {
+    if (this.mensajePopup === '¿Está seguro de que desea guardar los cambios?') {
+      this.guardarCambios();
+      //this._router.navigate(["/courses"])
+    } else if (this.mensajePopup === '¿Está seguro de que desea cancelar los cambios?') {
+      this.cancelarCambios();
+    }
+    this.cerrarPopup();
+  },
+
+  cerrarPopup() {
+    this.mostrarPopup = false;
+  },
+    // Guardar cambios
+  guardarCambios(){
+    let updatedCharlas = 
+    this.charlasAceptadas.map(charla => {
+      return {
+        idCharla: charla.idCharla,
+        titulo: charla.titulo,
+        descripcion: charla.descripcion,
+        tiempo: charla.tiempo,
+        fechaPropuesta: charla.fechaPropuesta,
+        idUsuario: charla.idUsuario,
+        idEstadoCharla: charla.idEstadoCharla,
+        idRonda: charla.idRonda,
+        imagenCharla: charla.imagenCharla
+      };
+    });
+
+    updatedCharlas.forEach(charla => {
+      this.perfilService.updateCharla(charla).then(response => {
+        console.log("Updating charlas" + response);
+      })
+    });
+  },
+
+  // Cancelar cambios
+  cancelarCambios(){
+    console.log("Cancelando cambios");
+    //this._router.navigate(["/courses"])
+  },
+
+  onDragStart(event, charla) {
+    this.draggedCharla = charla;
+  },
+
+  onDragOver(event) {
+    event.preventDefault();
+  },
+
+  onDrop(event, targetList) {
+    if (this.draggedCharla) {
+      if (targetList === 'propuestas') {
+        const charlaExistente = this.charlasPropuestas.some(c => c.idCharla === this.draggedCharla?.idCharla);
+        if (!charlaExistente) {
+          this.charlasAceptadas = this.charlasAceptadas.filter(c => c.idCharla !== this.draggedCharla?.idCharla);
+          this.charlasPropuestas.push(this.draggedCharla);
+          this.draggedCharla.idEstadoCharla = 1;
+          this.charlasPropuestas.sort((a, b) => b.votos - a.votos);
+        }
+      } else {
+        const charlaExistente = this.charlasAceptadas.some(c => c.idCharla === this.draggedCharla?.idCharla);
+        if (!charlaExistente) {
+          this.charlasPropuestas = this.charlasPropuestas.filter(c => c.idCharla !== this.draggedCharla?.idCharla);
+          this.charlasAceptadas.push(this.draggedCharla);
+          this.draggedCharla.idEstadoCharla = 2;
         }
       }
-    },
+      this.draggedCharla = null;
+    }
+  }
   },
   created() {
-    this.cargarPerfil();
-    this.cargarCursos();
+    this.cargarAlumnos();
+    this.cargarCharlas();
   },
-};
+  }
 </script>
 
 <style scoped>
