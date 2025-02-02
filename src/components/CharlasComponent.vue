@@ -44,7 +44,6 @@
             </button>
           </h2>
 
-
           <div :id="`collapse-${ronda.idRonda}`" class="accordion-collapse collapse"
             :aria-labelledby="`heading-${ronda.idRonda}`" data-bs-parent="#accordionRondas">
             <div class="accordion-body">
