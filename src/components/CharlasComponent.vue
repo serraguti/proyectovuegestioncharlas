@@ -35,6 +35,13 @@
         <div v-for="ronda in rondasFiltradas" :key="ronda.idRonda" 
         class="accordion-item">
           <h2 class="accordion-header" :id="`heading-${ronda.idRonda}`">
+            <button class="btn custom-button" @click="votosPorRonda(ronda.idRonda)">
+              Ver Votos Ronda 
+            </button>     
+             <div  v-if="votosRonda">
+               Alumnos: {{votosRonda.alumnoscurso}}
+               Votos completados: {{votosRonda.votoscompletados}}
+             </div>
             <button class="accordion-button collapsed d-flex justify-content-between align-items-center" type="button"
               data-bs-toggle="collapse" :data-bs-target="`#collapse-${ronda.idRonda}`" aria-expanded="false"
               :aria-controls="`collapse-${ronda.idRonda}`">
@@ -67,9 +74,6 @@
                         <button class="btn custom-button" @click="abrirModal(charla)">
                           Ver detalles
                         </button>
-                        <button class="btn custom-button" @click="votosPorRonda(ronda.idRonda)">
-                          Ver Votos Ronda 1
-                        </button>                        
                       </small>
                     </div>
                   </div>
@@ -275,7 +279,7 @@ export default {
     async votosPorRonda(idRonda) {
       this.votosRonda = 
         await this.charlasService.getVotosRonda(idRonda);
-      console.log(this.votosRonda.alumnoscurso);
+      console.log(this.votosRonda);
     },
     abrirModal(charla) {
       this.charlaSeleccionada = charla;
