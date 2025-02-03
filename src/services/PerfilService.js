@@ -272,9 +272,6 @@ export default class PerfilService {
         });
     }
 
-    
-
-
     updateEstadoUsuario(idUsuario, estado) {
         return new Promise((resolve, reject) => {
             const endpoint = `/api/profesor/updateestadoalumno/${idUsuario}/${estado}`;
@@ -392,4 +389,44 @@ export default class PerfilService {
         });
     }
 
+    //NUEVO
+    getAlumnosSinVotoRonda(idRonda) {
+        return new Promise((resolve, reject) => {
+            const endpoint = "api/profesor/alumnossinvotoronda/" + idRonda;
+            const token = Cookies.get('bearer_token');
+            console.log("Id de ronda: " + idRonda);
+            axios.get(Global.urlBase + endpoint, {
+                headers: {
+                    Authorization: token,
+                },
+            })
+            .then(response => {
+                resolve(response);
+            })
+            .catch(error => {
+                console.error("Error al obtener los alumnos sin Voto en Ronda:", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
+    getAlumnosConVotoRonda(idRonda) {
+        return new Promise((resolve, reject) => {
+            const endpoint = "api/profesor/alumnosconvotoronda/" + idRonda;
+            const token = Cookies.get('bearer_token');
+            console.log("Id de ronda: " + idRonda);
+            axios.get(Global.urlBase + endpoint, {
+                headers: {
+                    Authorization: token,
+                },
+            })
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener los alumnos sin Voto en Ronda:", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }    
 }

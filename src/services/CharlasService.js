@@ -499,4 +499,23 @@ export default class CharlasService {
             });
         });
     }
+
+    //NUEVO
+    getVotosCurso(idCurso) {
+        return new Promise((resolve, reject) => {
+            const endpoint = `api/votos/votoscurso/${idCurso}`;
+            console.log("Get votos curso: " + idCurso);
+            const token = Cookies.get('bearer_token');
+            axios.get(Global.urlBase + endpoint, {
+                headers: {
+                    Authorization: token,
+                },
+            })
+            .then(response => resolve(response.data))
+            .catch(error => {
+                console.error("Error al obtener los votos de la ronda:", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }    
 }

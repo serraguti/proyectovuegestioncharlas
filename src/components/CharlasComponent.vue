@@ -32,14 +32,15 @@
 
       <!-- Collapses de rondas -->
       <div class="accordion mt-4" id="accordionRondas">
-        <div v-for="ronda in rondasFiltradas" :key="ronda.idRonda" class="accordion-item">
+        <div v-for="ronda in rondasFiltradas" :key="ronda.idRonda" 
+        class="accordion-item">
           <h2 class="accordion-header" :id="`heading-${ronda.idRonda}`">
             <button class="accordion-button collapsed d-flex justify-content-between align-items-center" type="button"
               data-bs-toggle="collapse" :data-bs-target="`#collapse-${ronda.idRonda}`" aria-expanded="false"
               :aria-controls="`collapse-${ronda.idRonda}`">
               <span>{{ `Ronda ${ronda.idRonda} - ${ronda.descripcionModulo}` }}</span>
               <span class="text-muted ms-auto">
-                {{ obtenerTiempoRestante(ronda) }}
+                {{ obtenerTiempoRestante(ronda) }}, Charlas ({{charlasPorRonda(ronda.idRonda).length}})
               </span>
             </button>
           </h2>
@@ -66,6 +67,9 @@
                         <button class="btn custom-button" @click="abrirModal(charla)">
                           Ver detalles
                         </button>
+                        <button class="btn custom-button" @click="votosPorRonda(ronda.idRonda)">
+                          Ver Votos Ronda 1
+                        </button>                        
                       </small>
                     </div>
                   </div>
@@ -182,6 +186,8 @@
 
 <script>
 import CharlasService from "@/services/CharlasService";
+//NUEVO
+import PerfilService from "@/services/PerfilService";
 import Swal from "sweetalert2";
 const serviceCharlas = new CharlasService();
 import moment from 'moment';
@@ -191,6 +197,16 @@ export default {
   name: "CharlasComponent",
   data() {
     return {
+      //NUEVO
+      charlasPropuestas: [],
+      charlasAceptadas: [],
+      votosPropuestos: 0, // Total de votos de las charlas propuestas
+      totalVotos: 0, // Total de votos posibles
+      servicePerfil: new PerfilService(),
+      charlasService: new CharlasService(),
+      perfilUser: null,
+      votosRonda: null, 
+      //NUEVO
       charlas: [],
       rondas: [],
       comentarios: [],
@@ -218,6 +234,49 @@ export default {
     }
   },
   methods: {
+    //NUEVO
+    async cargarDatosCharlasRondas() {
+        if (localStorage.getItem('perfilUser')) {
+          try {
+            this.perfilUser = 
+            JSON.parse(localStorage.getItem('perfilUser'));
+          } catch(e) {
+            localStorage.removeItem('perfilUser');
+          }
+        }else{
+          this.perfilUser = 
+            await this.servicePerfil.getUsuarioPerfil();
+        }  
+      
+      const alumnosPorCurso = await this.servicePerfil.getAlumnosActivoProfesor();
+      this.totalVotos = alumnosPorCurso.length;
+      this.charlasPropuestas = 
+        this.charlas.filter((charla) => charla.idEstadoCharla === 1);
+      this.charlasAceptadas = 
+        this.charlas.filter((charla) => charla.idEstadoCharla === 2);
+      const votosCharlas = 
+        await this.charlasService.getVotosCurso(this.perfilUser.idCurso);
+      for (const charla of this.charlasPropuestas) {
+          const charlaConVotos = votosCharlas.filter((voto) => voto.idCharla === charla.idCharla);
+          charla.votos = charlaConVotos.votos ?? 0;
+          this.votosPropuestos += charla.votos; 
+      }
+      
+      this.charlasPropuestas.sort((a, b) => b.votos - a.votos);
+
+      // Procesar votos para charlas aceptadas
+      for (const charla of this.charlasAceptadas) {
+          const charlaConVotos = votosCharlas.filter((voto) => voto.idCharla === charla.idCharla);
+          charla.votos = charlaConVotos.votos ?? 0;
+          this.votosPropuestos += charla.votos; 
+      }
+      this.charlasAceptadas.sort((a, b) => b.votos - a.votos);      
+    },
+    async votosPorRonda(idRonda) {
+      this.votosRonda = 
+        await this.charlasService.getVotosRonda(idRonda);
+      console.log(this.votosRonda.alumnoscurso);
+    },
     abrirModal(charla) {
       this.charlaSeleccionada = charla;
       this.detalles(charla.idCharla);
@@ -402,6 +461,7 @@ export default {
   },
   mounted() {
     this.cargarRondas(); // Cargar rondas al iniciar
+    this.cargarDatosCharlasRondas();
   }
 };
 </script>

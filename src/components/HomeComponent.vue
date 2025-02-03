@@ -354,8 +354,12 @@ export default {
   mounted() {
     servicePerf.getUsuarioPerfil()
     .then(response => {
+      //NUEVO
       this.nombre = response.usuario.nombre;
       this.role = response.usuario.idRole;
+      //ALMACENAMOS LOS DATOS DEL USUARIO DE SU PERFIL
+      const perfil = JSON.stringify(response.usuario);
+      localStorage.setItem('perfilUser', perfil)
 
       if(this.role == 1){
         this.evaluarAlumnos();
