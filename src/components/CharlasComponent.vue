@@ -39,8 +39,9 @@
               Ver Votos Ronda 
             </button>     
              <div  v-if="votosRonda">
-               Alumnos: {{votosRonda.alumnoscurso}}
-               Votos completados: {{votosRonda.votoscompletados}}
+               Votos: {{votosRonda.votoscompletados}} / {{votosRonda.alumnoscurso}}
+               Charlas aceptadas {{charlasAceptadas.length}}
+               Charlas propuestas {{charlasPropuestas.length}}
              </div>
             <button class="accordion-button collapsed d-flex justify-content-between align-items-center" type="button"
               data-bs-toggle="collapse" :data-bs-target="`#collapse-${ronda.idRonda}`" aria-expanded="false"
@@ -279,6 +280,12 @@ export default {
     async votosPorRonda(idRonda) {
       this.votosRonda = 
         await this.charlasService.getVotosRonda(idRonda);
+      let charlasFilter = this.charlas;
+      charlasFilter = this.charlas.filter((charla) => charla.idRonda === idRonda);
+      this.charlasPropuestas = 
+        charlasFilter.filter((charla) => charla.idEstadoCharla === 1);
+      this.charlasAceptadas = 
+        charlasFilter.filter((charla) => charla.idEstadoCharla === 2);        
       console.log(this.votosRonda);
     },
     abrirModal(charla) {
