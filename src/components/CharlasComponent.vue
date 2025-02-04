@@ -35,7 +35,11 @@
         <div v-for="ronda in rondasFiltradas" :key="ronda.idRonda" 
         class="accordion-item">
           <h2 class="accordion-header" :id="`heading-${ronda.idRonda}`">
-
+            <!-- <div v-if="charlasPorRonda(ronda.idRonda).length > 0">
+              <button class="btn custom-button" @click="abrirModalRonda(ronda.idRonda)">
+                  Ver detalles Ronda
+              </button>
+            </div>             -->
             <button class="accordion-button collapsed d-flex justify-content-between align-items-center" type="button"
               data-bs-toggle="collapse" :data-bs-target="`#collapse-${ronda.idRonda}`" aria-expanded="false"
               :aria-controls="`collapse-${ronda.idRonda}`">
@@ -273,9 +277,9 @@ export default {
         }else{
           this.perfilUser = 
             await this.servicePerfil.getUsuarioPerfil();
-        }  
-      
-      const alumnosPorCurso = await this.servicePerfil.getAlumnosActivoProfesor();
+      }  
+      if (this.perfilUser.idRole == 1){
+        const alumnosPorCurso = await this.servicePerfil.getAlumnosActivoProfesor();
       this.totalVotos = alumnosPorCurso.length;
       this.charlasPropuestas = 
         this.charlas.filter((charla) => charla.idEstadoCharla === 1);
@@ -297,8 +301,9 @@ export default {
           charla.votos = charlaConVotos.votos ?? 0;
           this.votosPropuestos += charla.votos; 
       }
-      this.charlasAceptadas.sort((a, b) => b.votos - a.votos);      
-    },
+      this.charlasAceptadas.sort((a, b) => b.votos - a.votos);     
+      }
+     },
     async votosPorRonda(idRonda) {
       this.votosRonda = 
         await this.charlasService.getVotosRonda(idRonda);
@@ -529,6 +534,7 @@ export default {
   mounted() {
     this.cargarRondas(); // Cargar rondas al iniciar
     this.obtenerUsuario();
+
     this.cargarDatosCharlasRondas();
   }
 };
