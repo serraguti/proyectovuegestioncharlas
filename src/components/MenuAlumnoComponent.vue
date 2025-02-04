@@ -139,6 +139,7 @@ export default {
       }).then((result) => {
         if (result.isConfirmed) {
           Cookies.expire("bearer_token");
+          localStorage.removeItem('perfilUser');          
           this.$router.push("/login");
         }
       });

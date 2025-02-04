@@ -235,6 +235,7 @@ export default {
       charlasService: new CharlasService(),
       perfilUser: null,
       votosRonda: null, 
+      votosCurso: null, 
       mostrarModalRonda: false, 
       //NUEVO
       charlas: [],
@@ -277,7 +278,9 @@ export default {
         }else{
           this.perfilUser = 
             await this.servicePerfil.getUsuarioPerfil();
-      }  
+          const parsed = JSON.stringify(this.perfilUser);
+          localStorage.setItem('perfilUser', parsed)            
+        }  
       if (this.perfilUser.idRole == 1){
         const alumnosPorCurso = await this.servicePerfil.getAlumnosActivoProfesor();
       this.totalVotos = alumnosPorCurso.length;
@@ -303,7 +306,7 @@ export default {
       }
       this.charlasAceptadas.sort((a, b) => b.votos - a.votos);     
       }
-     },
+    },
     async votosPorRonda(idRonda) {
       this.votosRonda = 
         await this.charlasService.getVotosRonda(idRonda);
@@ -314,8 +317,11 @@ export default {
       this.charlasAceptadas = 
         charlasFilter.filter((charla) => charla.idEstadoCharla === 2);        
     },
+    async votosPorCurso(idCurso) {
+      this.votosCurso = 
+        await this.charlasService.getVotosCurso(idCurso);
+    },
     async votosPorCharla(idCharla) {
-//      await this.votosPorRonda(idRonda)      
       var votos = 
         this.votosRonda.filter((ronda) => ronda.idCharla === idCharla);
       console.log(votos);
@@ -384,8 +390,28 @@ export default {
           this.estadosDisponibles = [
             ...new Set(this.charlas.map((charla) => charla.estadoCharla)),
           ];
-          this.charlas.forEach(charla =>
-            this.cargarVotosCharla(charla.idCharla));
+          const distinct = Object.values(
+            this.charlas.reduce((o, a) => { o[a.idRonda] = a; return o}, {}));
+          if (this.perfilUser.idRole == 2){
+            //ALUMNO, COMPROBAMOS SUS VOTOS EN CADA RONDA
+            let rondasVotadas = [];
+            for (var ronda of distinct){
+              this.charlasService.getVotoAlumnoRonda(ronda.idRonda).then(response => {
+                  if (response.idUsuario != null){
+                    //ALMACENAMOS LAS RONDAS DONDE HA VOTADO EL ALUMNO
+                    rondasVotadas.push(response.idRonda);
+                    let charlasOnRonda = this.charlas.
+                      filter((charla) => charla.idRonda === response.idRonda);
+                    charlasOnRonda.forEach(charla =>
+                      this.cargarVotosCharla(charla.idCharla));
+                  }
+              })
+            }
+          }else {
+            //PROFESOR O ADMIN
+            this.charlas.forEach(charla =>
+              this.cargarVotosCharla(charla.idCharla));
+          }
         })
         .catch((error) => {
           console.error("Error al cargar las charlas:", error);
@@ -514,7 +540,7 @@ export default {
       serviceCharlas.getVotosCharla(idCharla)
       .then(response => {
         this.votosCharlas[idCharla] = response.votos;
-        console.log(response);
+        //console.log(response);
       })
         .catch(() => {
         console.error("❌ No se pudieron obtener los votos de la charla ID", idCharla);
@@ -523,19 +549,34 @@ export default {
     obtenerUsuario() {
       servicePerf.getUsuarioPerfil()
       .then(response => {
-      this.role = response.usuario.idRole;
+        const parsed = JSON.stringify(response.usuario);
+          localStorage.setItem('perfilUser', parsed)
+        this.role = response.usuario.idRole;
+        this.perfilUser = response.usuario;
       //console.log("rol: ", this.role);
-    })
-      .catch(() => {
-      console.error("❌ No se pudo obtener el usuario");
-    });
-  },
+      })
+        .catch(() => {
+        console.error("❌ No se pudo obtener el usuario");
+      });
+    },
+    async getVotosAlumno() {
+      await this.serviceCharlas.getVotosAlumno();
+    },    
   },
   mounted() {
     this.cargarRondas(); // Cargar rondas al iniciar
-    this.obtenerUsuario();
-
+    if (localStorage.getItem('perfilUser')) {
+          try {
+            this.perfilUser = 
+              JSON.parse(localStorage.getItem('perfilUser'));
+          } catch(e) {
+            localStorage.removeItem('perfilUser');
+          }
+    }else{
+          this.obtenerUsuario();
+    } 
     this.cargarDatosCharlasRondas();
+    //getVotosAlumno
   }
 };
 </script>

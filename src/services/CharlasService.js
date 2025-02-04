@@ -517,5 +517,27 @@ export default class CharlasService {
                 reject(error);
             });
         });
+    }
+
+    getVotoAlumnoRonda(idRonda){
+        return new Promise((resolve, reject) => {
+            const endpoint = 'api/votos/votoalumnoronda/' + idRonda;
+            const token = Cookies.get('bearer_token');
+            axios.get(
+                Global.urlBase + endpoint,
+                {
+                    headers: {
+                        Authorization: token, 
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener los votos alumno de una ronda: ", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
     }    
 }
