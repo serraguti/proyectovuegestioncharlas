@@ -116,6 +116,8 @@ export default class CharlasService {
                 }
             )
             .then(response => {
+                // console.log("Esta es la respuesta del Api");
+                // console.log(response.data);
                 resolve(response.data);
             })
             .catch(error => {

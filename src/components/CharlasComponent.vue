@@ -384,6 +384,7 @@ export default {
         .getCharlas()
         .then((response) => {
           this.charlas = response;
+          //console.log(this.charlas);
           this.charlasFiltradas = this.charlas;
           //console.log(response);
           this.filtrarCharlas();
