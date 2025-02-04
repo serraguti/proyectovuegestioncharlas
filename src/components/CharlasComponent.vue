@@ -35,17 +35,13 @@
         <div v-for="ronda in rondasFiltradas" :key="ronda.idRonda" 
         class="accordion-item">
           <h2 class="accordion-header" :id="`heading-${ronda.idRonda}`">
-            <div v-if="charlasPorRonda(ronda.idRonda).length > 0">
-              <button class="btn custom-button" @click="abrirModalRonda(ronda.idRonda)">
-                  Ver detalles Ronda
-              </button>
-            </div>
+
             <button class="accordion-button collapsed d-flex justify-content-between align-items-center" type="button"
               data-bs-toggle="collapse" :data-bs-target="`#collapse-${ronda.idRonda}`" aria-expanded="false"
               :aria-controls="`collapse-${ronda.idRonda}`">
               <span>{{ `Ronda ${ronda.idRonda} - ${ronda.descripcionModulo}` }}</span>
               <span class="text-muted ms-auto">
-                {{ obtenerTiempoRestante(ronda) }}, Charlas ({{charlasPorRonda(ronda.idRonda).length}})
+                {{ obtenerTiempoRestante(ronda) }}
               </span>
             </button>
           </h2>
@@ -68,10 +64,12 @@
                       <p class="card-text">{{ charla.descripcion }}</p>
                     </div>
                     <div class="card-footer">
-                      <small class="text-body-secondary">
-                        <button class="btn custom-button" @click="abrirModal(charla)">
+                      <small class="text-body-secondary d-flex justify-content-between align-items-center w-100">
+                        <button style="margin-top: 0px;" class="btn custom-button" @click="abrirModal(charla)">
                           Ver detalles
                         </button>
+                        <p v-if="role != 2" class="mb-0">Votos: 
+                          {{ votosCharlas[charla.idCharla] ?? '0' }}</p>
                       </small>
                     </div>
                   </div>
@@ -218,6 +216,7 @@ import Swal from "sweetalert2";
 const serviceCharlas = new CharlasService();
 import moment from 'moment';
 import 'moment/locale/es';
+const servicePerf = new PerfilService();
 
 export default {
   name: "CharlasComponent",
@@ -248,7 +247,8 @@ export default {
       charlaSeleccionada: null,
       mostrarDescripcion: false,
       mostrarRecursos: false,
-      mostrarComentarios: false
+      mostrarComentarios: false,
+      votosCharlas: {}
     };
   }, computed: {
     rondasFiltradas() {
@@ -308,7 +308,12 @@ export default {
         charlasFilter.filter((charla) => charla.idEstadoCharla === 1);
       this.charlasAceptadas = 
         charlasFilter.filter((charla) => charla.idEstadoCharla === 2);        
-      console.log(this.votosRonda);
+    },
+    async votosPorCharla(idCharla) {
+//      await this.votosPorRonda(idRonda)      
+      var votos = 
+        this.votosRonda.filter((ronda) => ronda.idCharla === idCharla);
+      console.log(votos);
     },
     async abrirModalRonda(idRonda) {
       await this.votosPorRonda(idRonda)
@@ -369,11 +374,13 @@ export default {
         .then((response) => {
           this.charlas = response;
           this.charlasFiltradas = this.charlas;
-          console.log(response);
+          //console.log(response);
           this.filtrarCharlas();
           this.estadosDisponibles = [
             ...new Set(this.charlas.map((charla) => charla.estadoCharla)),
           ];
+          this.charlas.forEach(charla =>
+            this.cargarVotosCharla(charla.idCharla));
         })
         .catch((error) => {
           console.error("Error al cargar las charlas:", error);
@@ -497,10 +504,31 @@ export default {
         if (minutos < 0)
           return `${segundos} seg`;
       }
-    }
+    },    
+    async cargarVotosCharla(idCharla) {
+      serviceCharlas.getVotosCharla(idCharla)
+      .then(response => {
+        this.votosCharlas[idCharla] = response.votos;
+        console.log(response);
+      })
+        .catch(() => {
+        console.error("❌ No se pudieron obtener los votos de la charla ID", idCharla);
+      });
+    },
+    obtenerUsuario() {
+      servicePerf.getUsuarioPerfil()
+      .then(response => {
+      this.role = response.usuario.idRole;
+      //console.log("rol: ", this.role);
+    })
+      .catch(() => {
+      console.error("❌ No se pudo obtener el usuario");
+    });
+  },
   },
   mounted() {
     this.cargarRondas(); // Cargar rondas al iniciar
+    this.obtenerUsuario();
     this.cargarDatosCharlasRondas();
   }
 };
