@@ -35,14 +35,11 @@
         <div v-for="ronda in rondasFiltradas" :key="ronda.idRonda" 
         class="accordion-item">
           <h2 class="accordion-header" :id="`heading-${ronda.idRonda}`">
-            <button class="btn custom-button" @click="votosPorRonda(ronda.idRonda)">
-              Ver Votos Ronda 
-            </button>     
-             <div  v-if="votosRonda">
-               Votos: {{votosRonda.votoscompletados}} / {{votosRonda.alumnoscurso}}
-               Charlas aceptadas {{charlasAceptadas.length}}
-               Charlas propuestas {{charlasPropuestas.length}}
-             </div>
+            <div v-if="charlasPorRonda(ronda.idRonda).length > 0">
+              <button class="btn custom-button" @click="abrirModalRonda(ronda.idRonda)">
+                  Ver detalles Ronda
+              </button>
+            </div>
             <button class="accordion-button collapsed d-flex justify-content-between align-items-center" type="button"
               data-bs-toggle="collapse" :data-bs-target="`#collapse-${ronda.idRonda}`" aria-expanded="false"
               :aria-controls="`collapse-${ronda.idRonda}`">
@@ -186,6 +183,30 @@
         </div>
       </div>
     </div>
+    <!-- MODAL PARA LAS RONDAS -->
+    <!-- Modal para mostrar de la Ronda -->
+    <div v-if="mostrarModalRonda" class="modal fade show" @click.self="cerrarModalRonda" tabindex="-1" role="dialog"
+      style="display: block; background: rgba(0, 0, 0, 0.8)">
+      <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              Votos: {{votosRonda.votoscompletados}} / {{votosRonda.alumnoscurso}}
+            </h5>
+            <button type="button" class="btn-close" aria-label="Close" @click="cerrarModalRonda"></button>
+          </div>
+          <div class="modal-body">
+            <p class="timestamp">
+              <strong>Votos:</strong>
+              {{votosRonda.votoscompletados}} / {{votosRonda.alumnoscurso}}
+            </p>
+            <p><strong>Charlas:</strong> {{charlasAceptadas.length + charlasPropuestas.length}}</p>
+            <p><strong>Aceptadas:</strong> {{charlasAceptadas.length}}</p>
+            <p><strong>Propuestas :</strong> {{charlasPropuestas.length}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
   </div>
 </template>
 
@@ -211,6 +232,7 @@ export default {
       charlasService: new CharlasService(),
       perfilUser: null,
       votosRonda: null, 
+      mostrarModalRonda: false, 
       //NUEVO
       charlas: [],
       rondas: [],
@@ -287,6 +309,13 @@ export default {
       this.charlasAceptadas = 
         charlasFilter.filter((charla) => charla.idEstadoCharla === 2);        
       console.log(this.votosRonda);
+    },
+    async abrirModalRonda(idRonda) {
+      await this.votosPorRonda(idRonda)
+      this.mostrarModalRonda = true;
+    },
+    cerrarModalRonda() {
+      this.mostrarModalRonda = false;
     },
     abrirModal(charla) {
       this.charlaSeleccionada = charla;
