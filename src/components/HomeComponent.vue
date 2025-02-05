@@ -196,13 +196,25 @@
               v-for="(evento, index) in (mostrarTodos ? presentacionesPendientes : presentacionesPendientes.slice(0, 4))" 
               :key="index"
             >
-              <span 
-                class="badge rounded-circle me-3 p-3"
-                style=" color: white; min-width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;"
-              >{{ new Date(evento.fechaPresentacion).getDate() }}</span>
+            <span
+                class="badge me-3 p-3"
+                style="
+                  color: white;
+                  min-width: 100px;
+                  height: 35px;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  border-radius: 7px;
+                "
+              >
+                {{ new Date(evento.fechaPresentacion).getDate()  }}
+                {{ formatoMes(evento.fechaPresentacion) }}
+                
+              </span>
               <span>{{ evento.descripcionModulo }}</span>
               <small class="text-muted ms-3">
-                {{ formatoMes(evento.fechaPresentacion) }}
+                
 
                 <!-- Botón de edición -->
                 <button class="btn btn-primary btn-sm mt-0 ms-3" @click="editarRonda(evento.idRonda)">
