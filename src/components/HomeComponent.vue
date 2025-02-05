@@ -214,8 +214,6 @@
               </span>
               <span>{{ evento.descripcionModulo }}</span>
               <small class="text-muted ms-3">
-                
-
                 <!-- Botón de edición -->
                 <button class="btn btn-primary btn-sm mt-0 ms-3" @click="editarRonda(evento.idRonda)">
                   <i class="fa-solid fa-pen"></i>
