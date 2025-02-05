@@ -98,11 +98,7 @@ export default {
       activeIndex: null, // Índice del enlace activo
       hoveredIndex: null, // Índice del enlace con hover
       isMobile: window.innerWidth <= 991, // Detecta si es móvil inicialmente
-      navItems: [
-        { name: "Home", link: "/", icon: "fa-solid fa-house" },
-        { name: "Charlas", link: "/charlas", icon: "fa-solid fa-comments" },
-        { name: "Alumnos", link: `/perfilprofesor/alumnos?idCurso=${this.idCurso}&activo=true`, icon: "fa-solid fa-users" },
-      ], // Elementos del menú
+      navItems: [], // Elementos del menú
       alumnos: [],
       curso: { activo: false },
       idCurso: 0,
@@ -160,9 +156,22 @@ export default {
         this.nombre = response.usuario.nombre;
         this.imagen = response.usuario.imagen;
         this.idCurso = response.usuario.idCurso;
+        //HASTA QUE NO TENGAMOS LOS DATOS DEL PROFE, NO CARGAMOS EL MENU
         if (this.idCurso == 0){
+          //EL PROFE NO TIENE CURSO, NI CHARLAS NI NADA
+          this.navItems = [
+            { name: "Home", link: "/", icon: "fa-solid fa-house" }
+          ]
           this.sinCurso = true;
-        }
+        }  else{
+          //EL PROFE TIENE CURSO, ASI QUE MOSTRAMOS TODO
+          this.navItems = [
+            { name: "Home", link: "/", icon: "fa-solid fa-house" },
+            { name: "Charlas", link: "/charlas", icon: "fa-solid fa-comments" },
+            { name: "Alumnos", link: `/perfilprofesor/alumnos?idCurso=${this.idCurso}&activo=true`, icon: "fa-solid fa-users" },
+          ]
+          this.sinCurso = false;
+        }      
       })
       .catch((error) => {
         console.error("Error al obtener los datos de usuario:", error);
