@@ -168,8 +168,7 @@ export default {
             },
             rondasDisponibles: [],
             tieneRecursos: false,
-            recursos: [],
-            maxTiempo: 30
+            recursos: []
         };
     },
     mounted(){
@@ -205,6 +204,22 @@ export default {
         .catch(error => {
             console.error('Error al obtener las rondas de charlas en new charla:', error);
         });
+    },
+    computed: {
+        maxTiempo() {
+        const rondaSeleccionada = this.rondasDisponibles.find(r => r.id === this.form.idRonda);
+        return rondaSeleccionada ? rondaSeleccionada.tiempo : 0;
+        }
+    },
+    watch: {
+        "form.idRonda"(newId) {
+            const ronda = this.rondasDisponibles.find(r => r.id === newId);
+            if (ronda) {
+                this.form.tiempo = Math.min(this.form.tiempo, ronda.tiempo); // Ajustar si está fuera del nuevo max
+            } else {
+                this.form.tiempo = 0;
+            }
+        }
     },
     methods: {
         puedeSubirCharlaEnRonda(ronda, charlas) {

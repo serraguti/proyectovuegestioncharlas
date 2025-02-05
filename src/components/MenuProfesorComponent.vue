@@ -30,17 +30,7 @@
             {{ item.name }}
           </router-link>
         </li>
-        <li v-if="sinCurso == false">
-                <button
-                  class="nav-link"
-                  @click="
-                    verAlumnos()
-                  "
-                >
-                  <i class="fa-solid fa-user"></i>
-                  Alumnos
-                </button>        
-        </li>
+
 
       </ul>
 
@@ -111,6 +101,7 @@ export default {
       navItems: [
         { name: "Home", link: "/", icon: "fa-solid fa-house" },
         { name: "Charlas", link: "/charlas", icon: "fa-solid fa-comments" },
+        { name: "Alumnos", link: `/perfilprofesor/alumnos?idCurso=${this.idCurso}&activo=true`, icon: "fa-solid fa-users" },
       ], // Elementos del menú
       alumnos: [],
       curso: { activo: false },
