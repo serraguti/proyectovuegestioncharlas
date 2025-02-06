@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="container" v-if="rolActual === 'ALUMNO'">
+    <div class="container">
       <!-- Filtro por ronda -->
       <div class="row row-cols-1 row-cols-md-2 mt-5">
         <div class="col">
@@ -34,19 +34,26 @@
       <div class="accordion mt-4" id="accordionRondas">
         <div v-for="ronda in rondasFiltradas" :key="ronda.idRonda" 
         class="accordion-item">
-          <h2 class="accordion-header" :id="`heading-${ronda.idRonda}`">
-            <!-- <div v-if="charlasPorRonda(ronda.idRonda).length > 0">
-              <button class="btn custom-button" @click="abrirModalRonda(ronda.idRonda)">
-                  Ver detalles Ronda
-              </button>
-            </div>             -->
-            <button class="accordion-button collapsed d-flex justify-content-between align-items-center" type="button"
+        <h2 class="accordion-header d-flex justify-content-between align-items-center" :id="`heading-${ronda.idRonda}`">    
+            <div class="container-btn-abrirModalRonda">
+              <i class="fa-solid fa-circle-info btn-abrirModalRonda" @click="abrirModalRonda(ronda.idRonda)"></i>  
+            </div>
+            <button class="accordion-button collapsed" type="button"
               data-bs-toggle="collapse" :data-bs-target="`#collapse-${ronda.idRonda}`" aria-expanded="false"
               :aria-controls="`collapse-${ronda.idRonda}`">
               <span>{{ `Ronda ${ronda.idRonda} - ${ronda.descripcionModulo}` }}</span>
-              <span class="text-muted ms-auto">
-                {{ obtenerTiempoRestante(ronda) }}
-              </span>
+              <div class="ms-auto" style="display: flex; flex-direction: row; align-items: center;">
+                <div v-if="rolActual != 'ALUMNO'"  class="info-ronda info-ronda-duracion rounded-5  text-center" style="width: 125px;">
+                  <span class="text-muted">
+                    <i class="fa-solid fa-clock-rotate-left" style="margin-right: 5px;"></i> {{ totalTiempoCharlas(ronda.idRonda) }} / {{ ronda.duracion }}min
+                  </span>
+                </div>
+                <div class="info-ronda info-ronda-restante rounded-5 text-center" style="width: 125px;">
+                  <span class="text-muted">
+                    <i class="fa-regular fa-clock" style="margin-right: 5px;"></i> {{ obtenerTiempoRestante(ronda) }}
+                  </span>
+                </div>
+              </div>
             </button>
           </h2>
 
@@ -106,6 +113,7 @@
             <p><strong>Usuario:</strong> {{ charlaSeleccionada.usuario }}</p>
             <p><strong>Curso:</strong> {{ charlaSeleccionada.nombreCurso }}</p>
             <p><strong>Estado:</strong> {{ charlaSeleccionada.estadoCharla }}</p>
+            <p><strong>Duración:</strong> {{ charlaSeleccionada.tiempo }} minutos</p>            
             <!-- Botones para cambiar entre Descripción, Comentarios y Recursos -->
             <div class="d-flex custom-buttons-container">
               <button class="custom-button"
@@ -205,6 +213,22 @@
             <p><strong>Charlas:</strong> {{charlasAceptadas.length + charlasPropuestas.length}}</p>
             <p><strong>Aceptadas:</strong> {{charlasAceptadas.length}}</p>
             <p><strong>Propuestas :</strong> {{charlasPropuestas.length}}</p>
+            <div v-if="rolActual != 'ALUMNO'" class="d-flex custom-buttons-container">
+              <button class="custom-button"
+                @click="mostrarNoVotados = !mostrarNoVotados;"
+                :class="{ 'active': mostrarNoVotados }">
+                <i class="fa-solid fa-cancel iconos"></i>
+                Usuarios sin votar
+              </button>
+            </div>
+
+            <hr v-if="mostrarNoVotados" />
+            <!-- Sección de Descripción -->
+            <div  v-if="mostrarNoVotados" class="custom-background custom-descripcion">
+              <div v-for="alumno in alumnosSinVotar" :key="alumno.idUsuario">
+                <p>{{ alumno }}</p>
+              </div>
+            </div>
             </div>
           </div>
         </div>
@@ -221,6 +245,7 @@ const serviceCharlas = new CharlasService();
 import moment from 'moment';
 import 'moment/locale/es';
 const servicePerf = new PerfilService();
+import Cookies from 'cookies-js';
 
 export default {
   name: "CharlasComponent",
@@ -253,7 +278,9 @@ export default {
       mostrarDescripcion: false,
       mostrarRecursos: false,
       mostrarComentarios: false,
-      votosCharlas: {}
+      votosCharlas: {},
+      mostrarNoVotados: false,
+      alumnosSinVotar: {}
     };
   }, computed: {
     rondasFiltradas() {
@@ -264,6 +291,8 @@ export default {
         return this.rondas.filter(ronda => ronda.idRonda === this.filtroRonda);
       }
     }
+  }, created() {
+    this.rolActual = Cookies.get('user_role');
   },
   methods: {
     //NUEVO
@@ -326,11 +355,18 @@ export default {
         this.votosRonda.filter((ronda) => ronda.idCharla === idCharla);
       console.log(votos);
     },
+    async alumnosNoVotaron(idRonda) {
+      if(this.rolActual != 'ALUMNO'){
+        this.alumnosSinVotar = await this.charlasService.getAlumnosSinVotoRonda(idRonda);
+      }
+    },
     async abrirModalRonda(idRonda) {
       await this.votosPorRonda(idRonda)
       this.mostrarModalRonda = true;
+      await this.alumnosNoVotaron(idRonda);
     },
     cerrarModalRonda() {
+      this.mostrarNoVotados = false;
       this.mostrarModalRonda = false;
     },
     abrirModal(charla) {
@@ -430,6 +466,11 @@ export default {
         (charla) => charla.idRonda === idRonda
       );
     },
+    totalTiempoCharlas(idRonda) {
+      return this.charlasPorRonda(idRonda)
+      .filter(charla => charla.estadoCharla === "ACEPTADA") // Filtrar solo aceptadas
+         .reduce((total, charla) => total + charla.tiempo, 0); // Sumar los tiempos
+    },
     //Para una página de detalles
     mostrarDetalles(idCharla) {
       this.$router.push({ name: "DetallesCharla", params: { id: idCharla } });
@@ -512,11 +553,11 @@ export default {
       const fechaCierre = new Date(ronda.fechaCierre);
 
       if (ahora < fechaPresentacion) {
-        return `🕒 ${this.formatearTiempo(fechaPresentacion - ahora)}`;
+        return `${this.formatearTiempo(fechaPresentacion - ahora)}`;
       } else if (ahora >= fechaPresentacion && ahora <= fechaCierre) {
-        return `🗳️ ${this.formatearTiempo(fechaCierre - fechaVotacion)} - Vota ya!`;
+        return `${this.formatearTiempo(fechaCierre - fechaVotacion)} - Vota ya!`;
       }
-      return `🔚 Finalizado`;
+      return `Finalizado`;
     },
     formatearTiempo(ms) {
       const dias = Math.floor(ms / (1000 * 60 * 60 * 24));
@@ -693,6 +734,21 @@ export default {
   /* Fondo en active */
   color: #fff;
 
+}
+
+.container-btn-abrirModalRonda {
+  border-right: #888 1px dotted;
+  padding-right: 10px;
+  margin-right: 2px;
+  padding-bottom: 5px;
+}
+.btn-abrirModalRonda {
+  margin-left: 10px;
+  font-size: 20px;
+  color: #4b57d2;
+}
+.btn-abrirModalRonda:hover {
+  cursor: pointer;
 }
 
 .iconos {
@@ -906,5 +962,19 @@ export default {
 
 .accordion-button:not(.collapsed) {
   background-color: #E2F3FF;
+}
+
+.info-ronda {
+  padding: 5px 10px;
+  font-size: 15px;
+  border-bottom: #33333367 2px solid;
+}
+
+.info-ronda-duracion {
+  background-color: rgb(188, 218, 230);
+  margin-right: 15px;
+}
+.info-ronda-restante {
+  background-color: rgb(183, 219, 183);
 }
 </style>
