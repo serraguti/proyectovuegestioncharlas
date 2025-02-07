@@ -11,7 +11,7 @@
     </div>
 
     <div
-      v-if="charlas.length == 0"
+      v-if="charlas.length == 0 && !cargando"
       class="alert alert-gris text-center"
       role="alert"
     >
@@ -212,13 +212,13 @@
                   >
                     <div class="recurso-header">
                       <h6 class="recurso-title">{{ recurso.nombre }}</h6>
-                      <router-link
-                        :to="recurso.url"
+                      <a
+                        :href="recurso.url"
                         target="_blank"
                         class="recurso-link"
                       >
                         <i class="fa-solid fa-link"></i> Ver Recurso
-                      </router-link>
+                      </a>
                       <!-- Botón de editar -->
                       <button
                         @click="editarRecurso(recurso)"
@@ -363,9 +363,9 @@ export default {
     },
 
     editarCharla(charla) {
-      Swal.fire({
-        title: "Editar Charla",
-        html: `
+  Swal.fire({
+    title: "Editar Charla",
+    html: `
       <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
         <input id="swal-titulo" class="swal2-input" placeholder="Título" value="${charla.titulo}" style="width: 90%;">
         <textarea id="swaldescripcion" class="swal2-textarea" placeholder="Descripción" style="width: 90%; height: 120px;">${charla.descripcion}</textarea>
@@ -374,36 +374,102 @@ export default {
         <input id="swal-imagen" class="swal2-input" placeholder="URL Imagen" value="${charla.imagenCharla}" style="width: 90%;">
       </div>
     `,
+    showCancelButton: true,
+    confirmButtonText: "Guardar",
+    cancelButtonText: "Cancelar",
+    showDenyButton: true, // Muestra el botón de "Rechazar"
+    denyButtonText: "<i class=\"fa-solid fa-plus\"></i>",
+    preConfirm: () => {
+      return {
+        idCharla: charla.idCharla,
+        titulo: document.getElementById("swal-titulo").value,
+        descripcion: document.getElementById("swaldescripcion").value,
+        tiempo: parseInt(document.getElementById("swal-tiempo").value),
+        fechaPropuesta: document.getElementById("swal-fecha").value,
+        idUsuario: charla.idUsuario,
+        idEstadoCharla: charla.idEstadoCharla,
+        idRonda: charla.idRonda,
+        imagenCharla: document.getElementById("swal-imagen").value,
+      };
+    },
+  }).then((result) => {
+    if (result.isConfirmed) {
+      serviceCharlas
+        .editarCharla(result.value)
+        .then(() => {
+          Swal.fire("Éxito", "Charla actualizada correctamente", "success");
+          this.cargarCharlas();
+        })
+        .catch(() => {
+          Swal.fire("Error", "No se pudo actualizar la charla", "error");
+        });
+    } else if (result.isDenied) {
+      // Aquí manejamos el tercer botón para abrir otro formulario
+      Swal.fire({
+        title: "Nuevo recurso",
+        html: `
+          <form id="formRecurso" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+            <input id="swal-nombreRecurso"  type="text" class="swal2-input" placeholder="Nombre" value="" style="width: 90%;">
+            <input id="swal-urlRecurso" type="text" class="swal2-input" placeholder="URL" value="" style="width: 90%;">
+            <input id="swal-descRecurso" type="text" class="swal2-input" placeholder="Descripción" value="" style="width: 90%;">
+          </form>
+        `,
         showCancelButton: true,
         confirmButtonText: "Guardar",
         cancelButtonText: "Cancelar",
         preConfirm: () => {
+          // Recoger los datos del formulario
+          const nombreRecurso = document.getElementById("swal-nombreRecurso").value;
+          const urlRecurso = document.getElementById("swal-urlRecurso").value;
+          const descRecurso = document.getElementById("swal-descRecurso").value;
+
           return {
-            idCharla: charla.idCharla,
-            titulo: document.getElementById("swal-titulo").value,
-            descripcion: document.getElementById("swaldescripcion").value,
-            tiempo: parseInt(document.getElementById("swal-tiempo").value),
-            fechaPropuesta: document.getElementById("swal-fecha").value,
-            idUsuario: charla.idUsuario,
-            idEstadoCharla: charla.idEstadoCharla,
-            idRonda: charla.idRonda,
-            imagenCharla: document.getElementById("swal-imagen").value,
+            nombre: nombreRecurso,
+            url: urlRecurso,
+            descripcion: descRecurso
           };
         },
-      }).then((result) => {
-        if (result.isConfirmed) {
-          serviceCharlas
-            .editarCharla(result.value)
-            .then(() => {
-              Swal.fire("Éxito", "Charla actualizada correctamente", "success");
-              this.cargarCharlas();
-            })
-            .catch(() => {
-              Swal.fire("Error", "No se pudo actualizar la charla", "error");
+      }).then((result2) => {
+        if (result2.isConfirmed) {
+          // Obtener los datos del formulario
+          const recurso = result2.value;
+
+          // Validar que todos los campos estén llenos
+          if (!recurso.nombre.trim() || !recurso.url.trim() || !recurso.descripcion.trim()) {
+            Swal.fire({
+              icon: "error",
+              title: "Campos incompletos",
+              text: "Rellena todos los campos antes de agregar el recurso."
             });
+            return;
+          }
+
+          // Validar la URL
+          const urlPattern = /^https?:\/\/.+$/;
+          if (!urlPattern.test(recurso.url.trim())) {
+            Swal.fire({
+              icon: "error",
+              title: "URL inválida",
+              text: "Ingresa una URL válida que comience con \"https://\" o \"http://\", seguida del dominio y la extensión."
+            });
+            return;
+          }
+
+          // Enviar los datos al servicio para guardar el recurso
+          serviceCharlas
+          .setRecurso({ ...recurso, idCharla: charla.idCharla })
+          .then(() => {
+            Swal.fire("Éxito", "Recurso agregado", "success");
+            this.cargarCharlas();
+          })
+          .catch(() => {
+            Swal.fire("Error", "No se pudo agregar el recurso", "error");
+          });
         }
       });
-    },
+    }
+  });
+},
 
     // Carga los comentarios de una charla
     cargarComentarios(idCharla) {
