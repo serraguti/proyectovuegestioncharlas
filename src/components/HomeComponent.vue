@@ -150,19 +150,22 @@
             <div class="list-group pt-1">
               <!-- Mostrar solo los primeros cinco eventos si no se ha hecho clic en "Ver más" -->
               <div 
-                class="list-group-item d-flex align-items-center" 
                 v-for="(evento, index) in (mostrarTodos ? eventosPresentaciones : eventosPresentaciones.slice(0, 5))" 
                 :key="index"
               >
-                <span 
-                  class="badge rounded-circle me-3 p-3"
-                  style=" color: white; min-width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;"
-                >{{ new Date(evento.date).getDate() }}</span>
-                <span>{{ evento.title }}</span>
-                <small class="text-muted ms-3">
-                  {{ formatoMes(evento.date) }}
-                </small>
-              </div>
+                <template v-if="index === 0 || formatoMes(evento.date) !== formatoMes(eventosPresentaciones[index - 1].date)">
+                  <div class="fw-bold mt-3" style="font-size: 20px; font-weight: bold; margin-top: 10px;">
+                    {{ formatoMes(evento.date) }}
+                  </div>
+                  <hr class="mt-0"/>
+                </template>
+                <div class="list-group-item">
+                  <span 
+                    class="list-group-item-number me-3"
+                  >{{ new Date(evento.date).getDate() }}</span>
+                  <b>{{ evento.title }}</b>
+                </div>
+                </div>
 
               <!-- Botón "Ver más" o "Ver menos" -->
               <div v-if="eventosPresentaciones.length > 5" class="text-end mt-1">
@@ -183,7 +186,7 @@
       <div class="row mt-lg-4 mt-2 pt-3">
         <!-- Columna izquierda: Presentaciones -->
         <div class="col-12 col-lg-6 mb-4 mb-lg-0 pe-lg-4">
-          <h2 class="mb-4 fw-semibold">Próximas charlas:</h2>
+          <h2 class="mb-4 fw-semibold">Próximas rondas:</h2>
           <div class="list-group">
             <!-- Verificar si hay presentaciones pendientes -->
             <div v-if="presentacionesPendientes.length == 0" class="alert alert-secondary">
@@ -192,35 +195,31 @@
 
             <!-- Mostrar solo los primeros cinco eventos si no se ha hecho clic en "Ver más" -->
             <div 
-              class="list-group-item d-flex align-items-center" 
               v-for="(evento, index) in (mostrarTodos ? presentacionesPendientes : presentacionesPendientes.slice(0, 4))" 
               :key="index"
             >
-            <span
-                class="badge me-3 p-3"
-                style="
-                  color: white;
-                  min-width: 100px;
-                  height: 35px;
-                  display: flex;
-                  justify-content: center;
-                  align-items: center;
-                  border-radius: 7px;
-                "
-              >
-                {{ new Date(evento.fechaPresentacion).getDate()  }}
-                {{ formatoMes(evento.fechaPresentacion) }}
-                
-              </span>
-              <span>{{ evento.descripcionModulo }}</span>
-              <small class="text-muted ms-3">
-                <!-- Botón de edición -->
-                <button class="btn btn-primary btn-sm mt-0 ms-3" @click="editarRonda(evento.idRonda)">
-                  <i class="fa-solid fa-pen"></i>
-                </button>
-              </small>
-            </div>
-
+                <template v-if="index === 0 || formatoMes(evento.fechaPresentacion) !== formatoMes(presentacionesPendientes[index - 1].fechaPresentacion)">
+                  <div class="fw-bold mt-3" style="font-size: 20px; font-weight: bold; margin-top: 10px;">
+                    {{ formatoMes(evento.fechaPresentacion) }}
+                  </div>
+                  <hr class="mt-0"/>
+                </template>
+                <div class="list-group-item">
+                  <span 
+                    class="list-group-item-number me-3"
+                  >{{ new Date(evento.fechaPresentacion).getDate() }}</span>
+                  <div class="d-flex justify-content-between align-items-center w-100">
+                  <b>{{ evento.descripcionModulo }}</b>
+                  <small class="text-muted ms-3">
+                    <!-- Botón de edición -->
+                    <button class="btn btn-primary btn-sm mt-0 ms-3" @click="editarRonda(evento.idRonda)">
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+                  </small>
+                    
+                  </div>
+                </div>
+                </div>
             <!-- Botón "Ver más" o "Ver menos" -->
             <div v-if="presentacionesPendientes.length > 4" class="text-end mt-1">
               <button 
@@ -1387,17 +1386,29 @@ export default {
   }
 
   .list-group-item {
-    background-color: #ced7e7;
-    border: 1px solid #314b7882;
+    background-color: #f3f3f3;
+    border: none;
+    box-shadow: 0 1px #c6c6c6;
     /* background-color: #f9f5ec;
     border: 2px solid #F5ECD5; */
     border-radius: 8px;
     margin-bottom: 10px;
-    padding: 10px 15px;
+    padding: 0 15px;
     display: flex; /* Para asegurar que el contenedor sea flexible */
     flex-direction: row; /* Alinea el contenido horizontalmente */
     align-items: center; /* Centra verticalmente */
-    justify-content: space-between; /* Espacia los elementos */
+  }
+
+  .list-group-item:hover {
+    outline: 2px solid #4651C5;
+  }
+
+  span.list-group-item-number {
+    font-size: 24px;
+    font-weight: bold;
+    color: #4651C5;
+    padding: 10px 15px 10px 0;
+    border-right: 2px solid #e2e2e2;
   }
 
   .badge {
