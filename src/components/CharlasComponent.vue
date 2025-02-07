@@ -187,9 +187,9 @@
                   <li v-for="recurso in recursos" :key="recurso.idRecurso" class="recurso-item">
                     <div class="recurso-header">
                       <h6 class="recurso-title">{{ recurso.nombre }}</h6>
-                      <a :href="recurso.url" target="_blank" class="recurso-link">
+                      <router-link :to="recurso.url" target="_blank" class="recurso-link">
                         <i class="fa-solid fa-link"></i> Ver Recurso
-                      </a>
+                      </router-link>
                     </div>
                     <p class="recurso-description">{{ recurso.descripcion }}</p>
                   </li>
@@ -211,7 +211,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
-              Votos: {{votosRonda.votoscompletados}} / {{votosRonda.alumnoscurso}}
+              {{ `Ronda - ${rondaActual.descripcionModulo}` }}
             </h5>
             <button type="button" class="btn-close" aria-label="Close" @click="cerrarModalRonda"></button>
           </div>
@@ -224,20 +224,28 @@
             <p><strong>Aceptadas:</strong> {{charlasAceptadas.length}}</p>
             <p><strong>Propuestas :</strong> {{charlasPropuestas.length}}</p>
             <div v-if="rolActual != 'ALUMNO'" class="d-flex custom-buttons-container">
+              <router-link class="custom-button"
+                :to="`/dragandrop/${rondaActual.idRonda}`">
+                <i class="fa-solid fa-pen-to-square iconos"></i>
+                Gestionar
+              </router-link>
               <button class="custom-button"
                 @click="mostrarNoVotados = !mostrarNoVotados;"
                 :class="{ 'active': mostrarNoVotados }">
-                <i class="fa-solid fa-cancel iconos"></i>
+                <i class="fa-solid fa-user-minus iconos"></i>
                 Usuarios sin votar
               </button>
             </div>
 
             <hr v-if="mostrarNoVotados" />
             <!-- Sección de Descripción -->
-            <div  v-if="mostrarNoVotados" class="custom-background custom-descripcion">
+            <div  v-if="mostrarNoVotados && alumnosSinVotar.length > 0" class="custom-background custom-descripcion">
               <div v-for="alumno in alumnosSinVotar" :key="alumno.idUsuario">
                 <p>{{ alumno }}</p>
               </div>
+            </div>
+            <div  v-if="mostrarNoVotados && alumnosSinVotar.length == 0" class="custom-background custom-descripcion">
+              <p>Todos los alumnos han votado en esta ronda!</p>
             </div>
             </div>
           </div>
@@ -291,7 +299,8 @@ export default {
       votosCharlas: {},
       mostrarNoVotados: false,
       alumnosSinVotar: {}, 
-      role: 0
+      role: 0,
+      rondaActual: {}
     };
   }, computed: {
     rondasFiltradas() {
@@ -372,6 +381,7 @@ export default {
       }
     },
     async abrirModalRonda(idRonda) {
+      this.rondaActual = await this.charlasService.getRonda(idRonda)
       await this.votosPorRonda(idRonda)
       this.mostrarModalRonda = true;
       await this.alumnosNoVotaron(idRonda);
@@ -778,12 +788,14 @@ export default {
   transition: all 0.3s ease-in-out;
 }
 
+.custom-button:hover {
+  cursor: pointer;
+}
 
 .custom-button.active {
   background-color: #527c58;
   /* Fondo en active */
   color: #fff;
-
 }
 
 .container-btn-abrirModalRonda {
