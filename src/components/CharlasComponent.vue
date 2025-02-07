@@ -64,13 +64,24 @@
                 <!-- Cards de charlas dentro de cada ronda -->
                 <div class="col-md-4 mb-4" v-for="charla in charlasPorRonda(ronda.idRonda)" :key="charla.idCharla">
                   <div class="card">
-                    <div v-if="charla.estadoCharla" :class="estadoClass(charla.estadoCharla)" class="estado-btn">
-                      {{ charla.estadoCharla }}
-                    </div>
                     <img class="card-img-top" :src="charla.imagenCharla ||
                       require('../assets/banner_default.jpg')
                       " @error="onImageError($event)" alt="Imagen de Charla" />
                     <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-center mb-4">
+                        <p v-if="perfilUser.idRole != 1" className="m-0">
+                          {{charla.estadoCharla === "ACEPTADA" ? `${charla.usuario.split(" ")[0]} - ` : ""}}🕒 {{charla.tiempo}} min
+                        </p>
+                        <p v-if="perfilUser.idRole != 2" class="m-0">{{charla.usuario.split(" ")[0]}} - 🕒 {{ charla.tiempo }} min</p>
+                        <div class="row gap-3 me-2">
+                          <span v-if="charla.estadoCharla" :class="estadoClass(charla.estadoCharla)" class="col card-badge">
+                            {{ charla.estadoCharla }}
+                          </span>
+                          <span v-if="perfilUser.idRole != 2" class="btn btn-info col card-badge votos">Votos: 
+                            {{ votosCharlas[charla.idCharla] ?? '0' }}
+                          </span>
+                        </div>                      
+                      </div> 
                       <h5 class="card-title">{{ charla.titulo }}</h5>
                       <p class="card-text">{{ charla.descripcion }}</p>
                     </div>
@@ -79,8 +90,6 @@
                         <button style="margin-top: 0px;" class="btn custom-button" @click="abrirModal(charla)">
                           Ver detalles
                         </button>
-                        <p v-if="role != 2" class="mb-0">Votos: 
-                          {{ votosCharlas[charla.idCharla] ?? '0' }}</p>
                       </small>
                     </div>
                   </div>
@@ -116,19 +125,19 @@
             <p><strong>Duración:</strong> {{ charlaSeleccionada.tiempo }} minutos</p>            
             <!-- Botones para cambiar entre Descripción, Comentarios y Recursos -->
             <div class="d-flex custom-buttons-container">
-              <button class="custom-button"
+              <button class="custom-button-detalles"
                 @click="mostrarDescripcion = !mostrarDescripcion; mostrarComentarios = false; mostrarRecursos = false;"
                 :class="{ 'active': mostrarDescripcion }">
                 <i class="fa-solid fa-circle-info iconos"></i>
                 Descripción
               </button>
-              <button class="custom-button"
+              <button class="custom-button-detalles"
                 @click="mostrarDescripcion = false; mostrarComentarios = !mostrarComentarios; mostrarRecursos = false;"
                 :class="{ 'active': mostrarComentarios }">
                 <i class="fa-solid fa-comments iconos"></i>
                 Comentarios
               </button>
-              <button class="custom-button"
+              <button class="custom-button-detalles"
                 @click="mostrarDescripcion = false; mostrarComentarios = false; mostrarRecursos = !mostrarRecursos"
                 :class="{ 'active': mostrarRecursos }">
                 <i class="fa-solid fa-book iconos"></i>
@@ -280,7 +289,8 @@ export default {
       mostrarComentarios: false,
       votosCharlas: {},
       mostrarNoVotados: false,
-      alumnosSinVotar: {}
+      alumnosSinVotar: {}, 
+      role: 0
     };
   }, computed: {
     rondasFiltradas() {
@@ -478,7 +488,7 @@ export default {
     estadoClass(estado) {
       switch (estado) {
         case "PROPUESTA":
-          return "btn btn-secondary";
+          return "btn btn-gris";
         case "ACEPTADA":
           return "btn btn-success btn-verde";
         case "RECHAZADA":
@@ -636,7 +646,7 @@ export default {
   display: -webkit-box;
   line-clamp: 3;
   /* Líneas que se van a mostrar */
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   /* Número de líneas visibles */
   -webkit-box-orient: vertical;
   padding: 5px 0px 5px 0px;
@@ -644,6 +654,7 @@ export default {
 
 .card-img-top {
   width: 100%;
+  border-radius: 24px 24px 0 0;
   max-height: 120px;
   object-fit: cover;
 }
@@ -653,7 +664,16 @@ export default {
 }
 
 .card-body {
-  height: 150px;
+  position: relative;
+  height: 170px;
+}
+
+.card-badge {
+  border-radius: 24px;
+  font-size: 12px;
+  color: black;
+  margin: 0;
+  padding: 2px 15px;
 }
 
 .card-header {
@@ -662,10 +682,12 @@ export default {
 }
 
 .card {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px grey;
+  /* border-bottom: solid 1px #494949; */
   transition: transform 0.3s;
   margin-bottom: 20px;
   margin-top: 10px;
+  border-radius: 24px;
 }
 
 .card:hover {
@@ -685,8 +707,21 @@ export default {
 }
 
 .btn-verde {
-  background-color: #527c58;
+  background-color: #87D0B1;
   border: none;
+  cursor: default;
+}
+
+.btn-gris {
+  background-color: #C6C6C6;
+  border: none;
+  cursor: default;
+}
+
+.votos {
+  background-color: #C9DCFF;
+  border: none;
+  cursor: default;
 }
 
 .modal-body {
@@ -707,6 +742,19 @@ export default {
 
 .custom-button {
   border-radius: 20px;
+  color: white;
+  font-size: 15px;
+  font-family: "Montserrat", serif;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 5px 20px;
+  background-color: #4651C5;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  border: none;
+}
+
+.custom-button-detalles {
+  border-radius: 20px;
   color: #3d3d3d;
   font-size: 15px;
   font-family: "Montserrat", serif;
@@ -718,7 +766,7 @@ export default {
   border: 1px solid #527c58;
 }
 
-.custom-button:hover {
+.custom-button-detalles:hover {
   background-color: #527a5899;
   border-radius: 20px;
   color: #3d3d3d;
@@ -728,6 +776,7 @@ export default {
   font-weight: bold;
   transition: all 0.3s ease-in-out;
 }
+
 
 .custom-button.active {
   background-color: #527c58;
