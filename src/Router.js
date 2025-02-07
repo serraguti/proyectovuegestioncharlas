@@ -13,6 +13,7 @@ import NotFoundComponent from "./components/NotFoundComponent.vue";
 import AlumnosCursoProfesorComponent from "@/components/AlumnosCursoProfesorComponent";
 import CharlasDetalleComponent from "@/components/CharlasDetalleComponent";
 import SeleccionRondasProfesor from "@/components/SeleccionRondasProfesor";
+import DragAndDropProfesor from "./components/DragAndDropProfesor.vue";
 
 const routes = [
     {
@@ -153,7 +154,7 @@ const routes = [
     {
         path: '/dragandrop/:id',
         name: 'dragandrop',
-        component: HomeComponent,
+        component: DragAndDropProfesor,
         beforeEnter: (to, from, next) => {
             const token = Cookies.get('bearer_token');
             if (token) {
