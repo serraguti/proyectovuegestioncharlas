@@ -132,17 +132,39 @@
                 <i class="fa-solid fa-circle-info iconos"></i>
                 Descripción
               </button>
-              <button class="custom-button-detalles"
-                @click="mostrarDescripcion = false; mostrarComentarios = !mostrarComentarios; mostrarRecursos = false;"
-                :class="{ 'active': mostrarComentarios }">
+              <button
+                class="custom-button-detalles d-flex align-items-center"
+                @click="
+                  mostrarDescripcion = false;
+                  mostrarComentarios = !mostrarComentarios;
+                  mostrarRecursos = false;
+                "
+                :class="{ active: mostrarComentarios }"
+              >
                 <i class="fa-solid fa-comments iconos"></i>
-                Comentarios
+                <span>Comentarios&nbsp;&nbsp; </span>
+                <span v-if="comentarios.length > 0" class="comment-count">{{
+                  comentarios.length
+                }}</span>
               </button>
-              <button class="custom-button-detalles"
-                @click="mostrarDescripcion = false; mostrarComentarios = false; mostrarRecursos = !mostrarRecursos"
-                :class="{ 'active': mostrarRecursos }">
+              <button
+                class="custom-button-detalles d-flex align-items-center"
+                @click="
+                  mostrarDescripcion = false;
+                  mostrarComentarios = false;
+                  mostrarRecursos = !mostrarRecursos;
+                "
+                :class="{ active: mostrarRecursos }"
+              >
                 <i class="fa-solid fa-book iconos"></i>
-                Recursos
+                <span>Recursos &nbsp;&nbsp;</span>
+                <span
+                  v-if="recursos.length > 0"
+                  class="count-badge"
+                  :class="{ 'active-count': mostrarRecursos }"
+                >
+                  {{ recursos.length }}
+                </span>
               </button>
             </div>
 
@@ -1038,5 +1060,51 @@ export default {
 }
 .info-ronda-restante {
   background-color: rgb(183, 219, 183);
+}
+/* BOTONES DETALLES CONTADOR COMENTARIOS Y RECURSOS */
+.custom-button-detalles {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espaciado entre icono, texto y contador */
+}
+
+.comment-count {
+  background-color: #4B57D2;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  width: 35px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Cambia el color del contador cuando el botón está activo */
+.custom-button-detalles.active .comment-count {
+  background-color: white;
+  color: #494949;
+}
+
+.count-badge {
+  background-color: #4b57d2;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  width: 35px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Cambia el color del contador cuando el botón está activo */
+.custom-button-detalles.active .count-badge {
+  background-color: white;
+  color: #494949;
 }
 </style>

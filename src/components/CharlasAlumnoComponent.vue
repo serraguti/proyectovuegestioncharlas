@@ -114,7 +114,7 @@
                 Descripción
               </button>
               <button
-                class="custom-button me-3"
+                class="custom-button d-flex align-items-center"
                 @click="
                   mostrarDescripcion = false;
                   mostrarComentarios = !mostrarComentarios;
@@ -123,10 +123,13 @@
                 :class="{ active: mostrarComentarios }"
               >
                 <i class="fa-solid fa-comments iconos"></i>
-                Comentarios
+                <span>Comentarios</span>
+                <span v-if="comentarios.length > 0" class="comment-count">{{
+                  comentarios.length
+                }}</span>
               </button>
               <button
-                class="custom-button"
+                class="custom-button d-flex align-items-center"
                 @click="
                   mostrarDescripcion = false;
                   mostrarComentarios = false;
@@ -135,7 +138,14 @@
                 :class="{ active: mostrarRecursos }"
               >
                 <i class="fa-solid fa-book iconos"></i>
-                Recursos
+                <span>Recursos</span>
+                <span
+                  v-if="recursos.length > 0"
+                  class="count-badge"
+                  :class="{ 'active-count': mostrarRecursos }"
+                >
+                  {{ recursos.length }}
+                </span>
               </button>
             </div>
 
@@ -839,5 +849,64 @@ export default {
   color: #888;
   text-align: center;
   margin-top: 10px;
+}
+
+.custom-buttons-container {
+  display: flex;
+  /* Usamos flex para alinear los botones */
+  align-items: center;
+  /* Centrado vertical */
+  justify-content: flex-start;
+  /* Alineación a la izquierda */
+  gap: 15px;
+  /* Espaciado entre botones */
+  margin-top: 25px;
+}
+
+/* BOTONES DETALLES CONTADOR COMENTARIOS Y RECURSOS */
+.custom-button-detalles {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espaciado entre icono, texto y contador */
+}
+
+.comment-count {
+  background-color: #4B57D2;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  width: 35px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Cambia el color del contador cuando el botón está activo */
+.custom-button-detalles.active .comment-count {
+  background-color: white;
+  color: #494949;
+}
+
+.count-badge {
+  background-color: #4b57d2;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  width: 35px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Cambia el color del contador cuando el botón está activo */
+.custom-button-detalles.active .count-badge {
+  background-color: white;
+  color: #494949;
 }
 </style>
