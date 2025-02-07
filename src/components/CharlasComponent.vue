@@ -62,7 +62,7 @@
             <div class="accordion-body">
               <div class="row g-3">
                 <!-- Cards de charlas dentro de cada ronda -->
-                <div class="col-md-4 mb-4" v-for="charla in charlasPorRonda(ronda.idRonda)" :key="charla.idCharla">
+                <div class="col-xxl-4 col-xl-6 col-lg-6 col-md-12 mb-4" v-for="charla in charlasPorRonda(ronda.idRonda)" :key="charla.idCharla">
                   <div class="card">
                     <img class="card-img-top" :src="charla.imagenCharla ||
                       require('../assets/banner_default.jpg')
@@ -73,15 +73,15 @@
                           {{charla.estadoCharla === "ACEPTADA" ? `${charla.usuario.split(" ")[0]} - ` : ""}}🕒 {{charla.tiempo}} min
                         </p>
                         <p v-if="perfilUser.idRole != 2" class="m-0">{{charla.usuario.split(" ")[0]}} - 🕒 {{ charla.tiempo }} min</p>
-                        <div class="row gap-3 me-2">
-                          <span v-if="charla.estadoCharla" :class="estadoClass(charla.estadoCharla)" class="col card-badge">
+                        <div class="d-flex justify-content-end gap-1">
+                          <div v-if="charla.estadoCharla" :class="estadoClass(charla.estadoCharla)" class="card-badge">
                             {{ charla.estadoCharla }}
-                          </span>
-                          <span v-if="perfilUser.idRole != 2" class="btn btn-info col card-badge votos">Votos: 
+                          </div>
+                          <div v-if="perfilUser.idRole != 2" class="btn btn-info card-badge votos">Votos:
                             {{ votosCharlas[charla.idCharla] ?? '0' }}
-                          </span>
+                          </div>
                         </div>                      
-                      </div> 
+                      </div>
                       <h5 class="card-title">{{ charla.titulo }}</h5>
                       <p class="card-text">{{ charla.descripcion }}</p>
                     </div>
@@ -94,6 +94,7 @@
                     </div>
                   </div>
                 </div>
+ 
                 <!-- Mensaje si no hay charlas -->
                 <div v-if="charlasPorRonda(ronda.idRonda).length === 0" class="text-center text-muted">
                   No hay charlas disponibles para esta ronda.
