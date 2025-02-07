@@ -120,7 +120,8 @@
               <strong>Fecha Propuesta:</strong>
               {{ formatearFecha(charlaSeleccionada.fechaPropuesta) }}
             </p>
-            <p><strong>Usuario:</strong> {{ charlaSeleccionada.usuario }}</p>
+            <p v-if="perfilUser.IdRole != 2"
+            ><strong>Usuario:</strong> {{ charlaSeleccionada.usuario }}</p>
             <p><strong>Curso:</strong> {{ charlaSeleccionada.nombreCurso }}</p>
             <p><strong>Estado:</strong> {{ charlaSeleccionada.estadoCharla }}</p>
             <p><strong>Duración:</strong> {{ charlaSeleccionada.tiempo }} minutos</p>            
