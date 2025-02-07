@@ -398,13 +398,16 @@ export default class CharlasService {
         return new Promise((resolve, reject) => {
             const endpoint = `api/comentarios/${idComentario}`;
             const token = Cookies.get('bearer_token');
-            
+
+            if (!token) {
+                reject("Token de autenticación no encontrado.");
+                return;
+            }
             axios.delete(
                 Global.urlBase + endpoint,
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`, 
-                        'Content-Type': 'application/json'
+                        Authorization: token,
                     }
                 }
             )
@@ -412,8 +415,8 @@ export default class CharlasService {
                 resolve(response.data);
             })
             .catch(error => {
-                console.error("Error al eliminar el comentario: ", error.response ? error.response.data : error);
-                reject(error);
+                console.error("Error al eliminar el comentario:", error.response ? error.response.data : error);
+                reject(error.response ? error.response.data : error);
             });
         });
     }
@@ -575,5 +578,23 @@ export default class CharlasService {
                 reject(error);
             });
         });
-    }    
+    }  
+    
+    updateComentario(comentario) {
+        return new Promise((resolve, reject) => {
+            const endpoint = "api/comentarios";
+            console.log("Comentario " + comentario);
+            const token = Cookies.get('bearer_token');
+            axios.put(Global.urlBase + endpoint, comentario, {
+                headers: {
+                    Authorization: token,
+                },
+            })
+            .then(response => resolve(response.data))
+            .catch(error => {
+                console.error("Error al actualizar el comentario:", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
 }
