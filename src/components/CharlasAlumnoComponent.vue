@@ -123,7 +123,7 @@
                 :class="{ active: mostrarComentarios }"
               >
                 <i class="fa-solid fa-comments iconos"></i>
-                <span>Comentarios</span>
+                <span>&nbsp;Comentarios &nbsp;</span>
                 <span v-if="comentarios.length > 0" class="comment-count">{{
                   comentarios.length
                 }}</span>
@@ -138,7 +138,7 @@
                 :class="{ active: mostrarRecursos }"
               >
                 <i class="fa-solid fa-book iconos"></i>
-                <span>Recursos</span>
+                <span>&nbsp;Recursos&nbsp;</span>
                 <span
                   v-if="recursos.length > 0"
                   class="count-badge"
@@ -871,7 +871,7 @@ export default {
 }
 
 .comment-count {
-  background-color: #4B57D2;
+  background-color: #4651c5;
   color: white;
   font-size: 12px;
   font-weight: bold;
@@ -891,7 +891,7 @@ export default {
 }
 
 .count-badge {
-  background-color: #4b57d2;
+  background-color: #4651c5;
   color: white;
   font-size: 12px;
   font-weight: bold;
@@ -909,4 +909,9 @@ export default {
   background-color: white;
   color: #494949;
 }
+
+.custom-button-detalles.active {
+  background-color: #527a5899;
+}
+
 </style>
