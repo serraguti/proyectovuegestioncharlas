@@ -35,7 +35,7 @@
         <div v-for="ronda in rondasFiltradas" :key="ronda.idRonda" 
         class="accordion-item">
         <h2 class="accordion-header d-flex justify-content-between align-items-center" :id="`heading-${ronda.idRonda}`">    
-            <div class="container-btn-abrirModalRonda">
+            <div class="container-btn-abrirModalRonda" v-if="perfilUser.idRole != 2">
               <i class="fa-solid fa-circle-info btn-abrirModalRonda" @click="abrirModalRonda(ronda.idRonda)"></i>  
             </div>
             <button class="accordion-button collapsed" type="button"
@@ -43,7 +43,7 @@
               :aria-controls="`collapse-${ronda.idRonda}`">
               <span>{{ `Ronda ${ronda.idRonda} - ${ronda.descripcionModulo}` }}</span>
               <div class="ms-auto" style="display: flex; flex-direction: row; align-items: center;">
-                <div v-if="rolActual != 'ALUMNO'"  class="info-ronda info-ronda-duracion rounded-5  text-center" style="width: 125px;">
+                <div v-if="perfilUser.role != 'ALUMNO'"  class="info-ronda info-ronda-duracion rounded-5  text-center" style="width: 125px;">
                   <span class="text-muted">
                     <i class="fa-solid fa-clock-rotate-left" style="margin-right: 5px;"></i> {{ totalTiempoCharlas(ronda.idRonda) }} / {{ ronda.duracion }}min
                   </span>
