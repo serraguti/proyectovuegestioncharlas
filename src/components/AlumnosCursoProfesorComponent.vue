@@ -136,7 +136,6 @@ export default {
     };
   },
   methods: {
-
     filtrarAlumnosActivos() {
       if (this.botonCodigo == 1) {
         this.alumnosFiltrados = this.alumnos;  //Vuelve al estado inicial; quita el filtro
@@ -146,41 +145,37 @@ export default {
         this.botonCodigo = 1;
       }
     },
-
+ 
     filtrarAlumnosInactivos() {
       if (this.botonCodigo == 2) {
-        this.alumnosFiltrados = this.alumnos;
-        this.botonCodigo = 0;
+        this.filtrarAlumnosActivos();
       } else {
         this.alumnosFiltrados = this.alumnos.filter(alumno => alumno.alumno.estadoUsuario == false)
         this.botonCodigo = 2;
       }
     },
-
+ 
     filtrarAlumnosCharlasPropuestas() {
       if (this.botonCodigo == 3) {
-        this.alumnosFiltrados = this.alumnos;
-        this.botonCodigo = 0;
+         this.filtrarAlumnosActivos();
       } else {
         this.alumnosFiltrados = this.alumnos.filter(alumno => alumno.alumno.estadoUsuario == true && alumno.charlasPropuestas > 0)
         this.botonCodigo = 3;
       }
     },
-
+ 
     filtrarAlumnosCharlasAceptadas() {
       if (this.botonCodigo == 4) {
-        this.alumnosFiltrados = this.alumnos;
-        this.botonCodigo = 0;
+        this.filtrarAlumnosActivos();
       } else {
         this.alumnosFiltrados = this.alumnos.filter(alumno => alumno.alumno.estadoUsuario == true && alumno.charlasAceptadas > 0)
         this.botonCodigo = 4;
       }
     },
-
+ 
     filtrarAlumnosSinCharlas() {
       if (this.botonCodigo == 5) {
-        this.alumnosFiltrados = this.alumnos;
-        this.botonCodigo = 0;
+        this.filtrarAlumnosActivos();
       } else {
         this.alumnosFiltrados = this.alumnos.filter(alumno => alumno.alumno.estadoUsuario == true && alumno.charlasTotales == 0)
         this.botonCodigo = 5;
