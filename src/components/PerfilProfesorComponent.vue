@@ -731,11 +731,15 @@ export default {
   .profile-buttons {
     width: 50%;
   }
+  .profile-info {
+    margin-top: 90px !important;
+  }
 }
 
 @media (min-width: 991px) and (max-width: 1200px) {
   .profile-info {
     padding-bottom: 50px !important;
+    /* margin-top: 200px; */
   }
 }
 
@@ -793,6 +797,7 @@ body {
 
 .profile-info h3 {
   margin: 0;
+  /* margin-top: 90px; */
 }
 
 .profile-buttons {
