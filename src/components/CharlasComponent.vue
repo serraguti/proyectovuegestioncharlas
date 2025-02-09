@@ -120,7 +120,7 @@
               <strong>Fecha Propuesta:</strong>
               {{ formatearFecha(charlaSeleccionada.fechaPropuesta) }}
             </p>
-            <p v-if="perfilUser.IdRole != 2"
+            <p v-if="perfilUser.idRole != 2 || charlaSeleccionada.estadoCharla == 'ACEPTADA'"
             ><strong>Usuario:</strong> {{ charlaSeleccionada.usuario }}</p>
             <p><strong>Curso:</strong> {{ charlaSeleccionada.nombreCurso }}</p>
             <p><strong>Estado:</strong> {{ charlaSeleccionada.estadoCharla }}</p>
