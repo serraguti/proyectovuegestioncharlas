@@ -120,7 +120,7 @@
               <strong>Fecha Propuesta:</strong>
               {{ formatearFecha(charlaSeleccionada.fechaPropuesta) }}
             </p>
-            <p v-if="perfilUser.IdRole != 2"
+            <p v-if="perfilUser.idRole != 2 || charlaSeleccionada.estadoCharla == 'ACEPTADA'"
             ><strong>Usuario:</strong> {{ charlaSeleccionada.usuario }}</p>
             <p><strong>Curso:</strong> {{ charlaSeleccionada.nombreCurso }}</p>
             <p><strong>Estado:</strong> {{ charlaSeleccionada.estadoCharla }}</p>
@@ -261,9 +261,9 @@
                   <li v-for="recurso in recursos" :key="recurso.idRecurso" class="recurso-item">
                     <div class="recurso-header">
                       <h6 class="recurso-title">{{ recurso.nombre }}</h6>
-                      <router-link :to="recurso.url" target="_blank" class="recurso-link">
+                      <a :href="recurso.url" target="_blank" class="recurso-link">
                         <i class="fa-solid fa-link"></i> Ver Recurso
-                      </router-link>
+                      </a>
                     </div>
                     <p class="recurso-description">{{ recurso.descripcion }}</p>
                   </li>
