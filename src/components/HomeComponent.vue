@@ -474,11 +474,11 @@ export default {
               const fechaCierre = new Date(ronda.fechaCierre + 'Z'); // Agregar "Z" al final para interpretar como UTC
               const fechaLimiteVotacion = new Date(ronda.fechaLimiteVotacion + 'Z');
               const fechaPresentacion = new Date(ronda.fechaPresentacion + 'Z');
-
-              const fechaCierreDia = new Date(fechaCierre.getFullYear(), fechaCierre.getMonth(), fechaCierre.getDate());
-
+              //fechaLimiteVotacion.setDate(fechaLimiteVotacion.getDate() + 1)
+              const fechaCierreDia = new Date(fechaCierre.getFullYear(), fechaCierre.getMonth(), fechaCierre.getDate() + 1);
+              const fechaLimiteVotacionDia = new Date(fechaLimiteVotacion.getFullYear(), fechaLimiteVotacion.getMonth(), fechaLimiteVotacion.getDate() + 2);
               // Comprobar si la ronda está abierta para solicitar charlas
-              if (ahora < fechaCierreDia) {
+              if (ahora <= fechaCierreDia) {
                 isRondaAbierta = true;
 
                 events.push({
@@ -499,21 +499,32 @@ export default {
 
               // Comprobar si hay una votación activa (entre la fecha de cierre y la fecha límite de votación)
               if (ahora <= fechaLimiteVotacion) {
-                if (ahora > fechaCierreDia && ahora <= fechaLimiteVotacion){
-                  isVotacionActiva = true;
+                console.log("Ahora: " + ahora);
+                console.log("fechaCierreDia: " + fechaCierreDia);
+                console.log("fechaLimiteVotacionDia: " + fechaLimiteVotacionDia);
+                isVotacionActiva = true;
 
-                  // Verificar si el alumno ya votó en esta ronda
-                  const votoEnRonda = votosAlumno.some(voto => voto.idRonda === ronda.idRonda);
+                // Verificar si el alumno ya votó en esta ronda
+                const votoEnRonda = votosAlumno.some(voto => voto.idRonda === ronda.idRonda);
   
-                  if (!votoEnRonda) {
-                    this.puedeVotar = true;
-                  }
+                if (!votoEnRonda) {
+                  this.puedeVotar = true;
+                }
+                if (ahora > fechaCierreDia && ahora <= fechaLimiteVotacion){
+                  // isVotacionActiva = true;
+
+                  // // Verificar si el alumno ya votó en esta ronda
+                  // const votoEnRonda = votosAlumno.some(voto => voto.idRonda === ronda.idRonda);
+  
+                  // if (!votoEnRonda) {
+                  //   this.puedeVotar = true;
+                  // }
                 }
 
                 events.push({
                   title: `${ronda.descripcionModulo}`,
-                  start: fechaCierre.toISOString().split('T')[0],
-                  end: fechaLimiteVotacion.toISOString().split('T')[0],
+                  start: fechaCierreDia.toISOString().split('T')[0],
+                  end: fechaLimiteVotacionDia.toISOString().split('T')[0],
                   color: '#578e73'
                 });
               }
