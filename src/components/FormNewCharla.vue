@@ -172,14 +172,20 @@ export default {
         };
     },
     mounted(){
+        Date.prototype.addDays = function(days) {
+            var date = new Date(this.valueOf());
+            date.setDate(date.getDate() + days);
+            return date;
+        }
         serviceChar.getRondas()
         .then(response => {
             const rondas = response;
+            console.log(rondas);
             const fechaActual = new Date();
-
+            
             // Filtrar rondas abiertas antes de la fecha de cierre
             this.rondasDisponibles = rondas
-            .filter(ronda => new Date(ronda.fechaCierre) > fechaActual)
+            .filter(ronda => new Date(ronda.fechaCierre).addDays(1) > fechaActual)
             .map(ronda => ({
                 id: ronda.idRonda,
                 descripcion: ronda.descripcionModulo,
