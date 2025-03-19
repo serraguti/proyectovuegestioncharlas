@@ -90,6 +90,9 @@ export default {
                 const fechaActual = new Date();
 
                 // Filtrar rondas abiertas antes de la fecha de cierre
+                //AQUI DEBERIAN DE PODER VOTAR LOS ALUMNOS DESPUES DE LA FECHA DE CIERRE 
+                //EN LA RONDA Y CUANDO LA FECHA DE VOTACION NO HA SIDO SOBREPASADA
+                //revisar esto
                 this.rondasDisponibles = rondas
                 .filter(ronda => new Date(ronda.fechaCierre + 'Z') < fechaActual && new Date(ronda.fechaLimiteVotacion + 'Z') >= fechaActual.addDays(-1))
                 .map(ronda => ({
