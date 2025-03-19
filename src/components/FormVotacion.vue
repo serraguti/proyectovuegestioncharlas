@@ -76,6 +76,11 @@ export default {
         };
     },
     mounted(){
+        Date.prototype.addDays = function(days) {
+            var date = new Date(this.valueOf());
+            date.setDate(date.getDate() + days);
+            return date;
+        }
         serviceChar.getRondas()
         .then(response => {
             const rondas = response;
@@ -86,14 +91,15 @@ export default {
 
                 // Filtrar rondas abiertas antes de la fecha de cierre
                 this.rondasDisponibles = rondas
-                .filter(ronda => new Date(ronda.fechaCierre + 'Z') < fechaActual && new Date(ronda.fechaLimiteVotacion + 'Z') >= fechaActual)
+                .filter(ronda => new Date(ronda.fechaCierre + 'Z') < fechaActual && new Date(ronda.fechaLimiteVotacion + 'Z') >= fechaActual.addDays(-1))
                 .map(ronda => ({
                     id: ronda.idRonda,
                     descripcion: ronda.descripcionModulo,
                     fechaPresentacion: ronda.fechaPresentacion,
                     tiempo: ronda.duracion
                 }));
-
+                console.log(rondas);
+                console.log(fechaActual)
                 // Filtrar rondas activas para votar, asegurándose de que el alumno no haya votado aún
                 this.rondasVotar = this.rondasDisponibles.filter(ronda => {
                     // Verificar si el alumno ya votó en esa ronda
