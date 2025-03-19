@@ -496,12 +496,14 @@ export default {
                   this.puedeSubirCharla = true;
                 }
               }
-
+              // console.log("Ahora: " + ahora);
+              //   console.log("fechaCierreDia: " + fechaCierreDia);
+              //   console.log("fechaLimiteVotacionDia: " + fechaLimiteVotacionDia);
               // Comprobar si hay una votación activa (entre la fecha de cierre y la fecha límite de votación)
-              if (ahora <= fechaLimiteVotacion) {
-                console.log("Ahora: " + ahora);
-                console.log("fechaCierreDia: " + fechaCierreDia);
-                console.log("fechaLimiteVotacionDia: " + fechaLimiteVotacionDia);
+              if (ahora <= fechaLimiteVotacionDia) {
+                // console.log("Ahora: " + ahora);
+                // console.log("fechaCierreDia: " + fechaCierreDia);
+                // console.log("fechaLimiteVotacionDia: " + fechaLimiteVotacionDia);
                 isVotacionActiva = true;
 
                 // Verificar si el alumno ya votó en esta ronda
