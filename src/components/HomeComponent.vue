@@ -361,6 +361,11 @@ export default {
     };
   },
   mounted() {
+    Date.prototype.addDays = function(days) {
+            var date = new Date(this.valueOf());
+            date.setDate(date.getDate() + days);
+            return date;
+    }
     servicePerf.getUsuarioPerfil()
     .then(response => {
       //NUEVO
@@ -484,7 +489,7 @@ export default {
                 events.push({
                   title: `${ronda.descripcionModulo}`,
                   start: ahora.toISOString().split('T')[0],
-                  end: fechaCierre.toISOString().split('T')[0],
+                  end: fechaCierre.addDays(1).toISOString().split('T')[0],
                   color: '#d76060'
                 });
 
@@ -497,14 +502,20 @@ export default {
                 }
               }
               // console.log("Ahora: " + ahora);
-              //   console.log("fechaCierreDia: " + fechaCierreDia);
-              //   console.log("fechaLimiteVotacionDia: " + fechaLimiteVotacionDia);
+              // console.log("fechaCierreDiaaaaa: " + fechaCierre);
+              // console.log("fechaLimiteVotacionDiaaaaa: " + fechaLimiteVotacion);
               // Comprobar si hay una votación activa (entre la fecha de cierre y la fecha límite de votación)
-              if (ahora <= fechaLimiteVotacionDia) {
+              if (ahora <= fechaLimiteVotacion) {
+                //31/03 >= 29/03
+                // if (fechaLimiteVotacion <= fechaCierre && fechaCierre >= ahora){
+                //   isVotacionActiva = true;
+                //   console.log("Lo tenemos");
+                // }
+              
                 // console.log("Ahora: " + ahora);
                 // console.log("fechaCierreDia: " + fechaCierreDia);
                 // console.log("fechaLimiteVotacionDia: " + fechaLimiteVotacionDia);
-                isVotacionActiva = true;
+                //isVotacionActiva = true;
 
                 // Verificar si el alumno ya votó en esta ronda
                 const votoEnRonda = votosAlumno.some(voto => voto.idRonda === ronda.idRonda);
@@ -512,8 +523,8 @@ export default {
                 if (!votoEnRonda) {
                   this.puedeVotar = true;
                 }
-                if (ahora > fechaCierreDia && ahora <= fechaLimiteVotacion){
-                  // isVotacionActiva = true;
+                if (ahora >= fechaCierreDia && ahora <= fechaLimiteVotacion){
+                  isVotacionActiva = true;
 
                   // // Verificar si el alumno ya votó en esta ronda
                   // const votoEnRonda = votosAlumno.some(voto => voto.idRonda === ronda.idRonda);
@@ -522,7 +533,7 @@ export default {
                   //   this.puedeVotar = true;
                   // }
                 }
-
+                //console.log(fechaLimiteVotacionDia);
                 events.push({
                   title: `${ronda.descripcionModulo}`,
                   start: fechaCierreDia.toISOString().split('T')[0],
