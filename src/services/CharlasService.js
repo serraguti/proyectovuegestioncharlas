@@ -5,7 +5,7 @@ import Cookies from 'cookies-js';
 export default class CharlasService {
     getRondas() {
         return new Promise((resolve, reject) => {
-            const endpoint = 'api/rondas/rondascurso';
+            const endpoint = 'api/rondas/rondascursocomplete';
             const token = Cookies.get('bearer_token');
             axios.get(
                 Global.urlBase + endpoint,

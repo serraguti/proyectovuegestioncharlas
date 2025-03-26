@@ -481,10 +481,14 @@ export default {
               const fechaPresentacion = new Date(ronda.fechaPresentacion + 'Z');
               //fechaLimiteVotacion.setDate(fechaLimiteVotacion.getDate() + 1)
               const fechaCierreDia = new Date(fechaCierre.getFullYear(), fechaCierre.getMonth(), fechaCierre.getDate() + 1);
-              const fechaLimiteVotacionDia = new Date(fechaLimiteVotacion.getFullYear(), fechaLimiteVotacion.getMonth(), fechaLimiteVotacion.getDate() + 2);
+              //const fechaLimiteVotacionDia = new Date(fechaLimiteVotacion.getFullYear(), fechaLimiteVotacion.getMonth(), fechaLimiteVotacion.getDate() + 2);
               // Comprobar si la ronda está abierta para solicitar charlas
-              if (ahora <= fechaCierreDia) {
-                isRondaAbierta = true;
+              //NOS SALTAMOS EL IF Y MIRAMOS LA RONDA A VER
+              isRondaAbierta = ronda.subirCharlas;
+              //CAMBIAMOS EL IF SI LA RONDA ESTA ABIERTA
+              if (isRondaAbierta) {
+              //if (ahora <= fechaCierreDia) {
+                //isRondaAbierta = true;
 
                 events.push({
                   title: `${ronda.descripcionModulo}`,
@@ -505,41 +509,35 @@ export default {
               // console.log("fechaCierreDiaaaaa: " + fechaCierre);
               // console.log("fechaLimiteVotacionDiaaaaa: " + fechaLimiteVotacion);
               // Comprobar si hay una votación activa (entre la fecha de cierre y la fecha límite de votación)
-              if (ahora <= fechaLimiteVotacion) {
-                //31/03 >= 29/03
-                // if (fechaLimiteVotacion <= fechaCierre && fechaCierre >= ahora){
-                //   isVotacionActiva = true;
-                //   console.log("Lo tenemos");
-                // }
-              
-                // console.log("Ahora: " + ahora);
-                // console.log("fechaCierreDia: " + fechaCierreDia);
-                // console.log("fechaLimiteVotacionDia: " + fechaLimiteVotacionDia);
-                //isVotacionActiva = true;
-
+              //COMPROBAMOS SI YA PODEMOS VOTAR
+              //VOTACION ACTIVA DESDE EL API
+              isVotacionActiva = ronda.votarRonda;
+              if (isVotacionActiva) {
                 // Verificar si el alumno ya votó en esta ronda
                 const votoEnRonda = votosAlumno.some(voto => voto.idRonda === ronda.idRonda);
   
                 if (!votoEnRonda) {
                   this.puedeVotar = true;
                 }
-                if (ahora >= fechaCierreDia && ahora <= fechaLimiteVotacion){
-                  isVotacionActiva = true;
-
-                  // // Verificar si el alumno ya votó en esta ronda
-                  // const votoEnRonda = votosAlumno.some(voto => voto.idRonda === ronda.idRonda);
-  
-                  // if (!votoEnRonda) {
-                  //   this.puedeVotar = true;
-                  // }
-                }
-                //console.log(fechaLimiteVotacionDia);
+                //LA VOTACION DESPUES DEL CIERRE DEL DIA
                 events.push({
                   title: `${ronda.descripcionModulo}`,
-                  start: fechaCierreDia.toISOString().split('T')[0],
-                  end: fechaLimiteVotacionDia.toISOString().split('T')[0],
+                  start: fechaCierreDia.addDays(1).toISOString().split('T')[0],
+                  end: fechaLimiteVotacion.toISOString().split('T')[0],
                   color: '#578e73'
                 });
+              }else{
+                //AUNQUE NO TENGAMOS VOTACION ACTIVA, MOSTRAMOS EL CALENDARIO
+                //PERO SOLAMENTE DE LAS VOTACIONES MAYORES A AHORA
+                //Y QUE NO SE HAN PRESENTADO
+                if (ahora <= fechaPresentacion) {
+                  events.push({
+                      title: `${ronda.descripcionModulo}`,
+                      start: fechaCierreDia.addDays(1).toISOString().split('T')[0],
+                      end: fechaLimiteVotacion.toISOString().split('T')[0],
+                      color: '#578e73'
+                  });
+                }
               }
 
               if (ahora <= fechaPresentacion) {
