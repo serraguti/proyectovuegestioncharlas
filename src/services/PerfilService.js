@@ -107,7 +107,40 @@ export default class PerfilService {
         }).then(response => response.data);
     }
 
+
+    getCursosRoleProfesor() {
+        return axios.get(Global.urlBase + "api/Profesor/CursosActivos", {
+            headers: { Authorization: Cookies.get("bearer_token") },
+        }).then(response => response.data);
+    }
+
+    // insertCursoProfesor(idCurso) {
+    //     const endpoint = `api/Profesor/RoleCurso/${idCurso}`;
+    //     return axios.put(Global.urlBase + endpoint, {
+    //         headers: { Authorization: Cookies.get("bearer_token") },
+    //     });
+    // }
     
+    insertCursoProfesor(idCurso){
+        return new Promise((resolve, reject) => {
+            const endpoint = `/api/Profesor/RoleCurso/${idCurso}`;
+            const token = Cookies.get('bearer_token');
+
+            axios.put(Global.urlBase + endpoint, {}, {
+                headers: {
+                    Authorization: token,
+                },
+            })
+                .then(response => {
+                    resolve(response.data);
+                })
+                .catch(error => {
+                    console.error("Error al asociar profesor al curso:", error);
+                    reject(error);
+                });
+        });
+    }
+
     updateRonda(ronda) {
         return axios.put(`${Global.urlBase}api/Profesor/UpdateRonda`, ronda, {
             headers: { Authorization: Cookies.get("bearer_token") },

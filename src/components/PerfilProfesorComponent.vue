@@ -45,11 +45,18 @@
           </button>
           <button
             class="btn botoncrearcurso me-0"
-            style="margin-left: 10px;"
+            style="margin-left: 10px;margin-right: 10px;"
             @click="abrirModalCrearCurso"
           >
             Crear Curso
           </button>
+          <button
+            class="btn botonseleccionarcurso me-0"
+            style="margin-left: 10px;;margin-right: 10px;"
+            @click="abrirModalseleccionarCurso"
+          >
+            Seleccionar Curso
+          </button>          
         </div>
       </div>
       <hr />
@@ -359,6 +366,51 @@ export default {
         }
       } else if (!isConfirmed) {
         console.log("El usuario canceló la creación del curso.");
+      }
+    },    
+    async abrirModalseleccionarCurso() {
+      //getCursosRoleProfesor
+      //updateRoleCursoProfesor
+      let html = '<select class="class="swal2-input" id="idCurso">';
+      let cursos = await  this.perfilService.getCursosRoleProfesor();
+     
+      for (var c of cursos){
+        html += "<option value='" + c.idCurso + "'>" + "(" + c.idCurso + ")"
+          +  c.nombre + "</option>";
+      }
+      html += "</select>";
+      const { value: formValues, isConfirmed } = await Swal.fire({
+        title: "Seleccionar Curso",
+        html: html,
+        focusConfirm: false,
+        showCancelButton: true, // Mostrar el botón de cancelar
+        confirmButtonText: "Asociar", // Cambiar texto del botón "Confirmar"
+        cancelButtonText: "Cancelar", // Cambiar texto del botón "Cancelar"
+        preConfirm: () => {
+          const idCurso = parseInt(document.getElementById("idCurso").value); // Permite un ID vacío que se pone como 0 por defecto
+          return { idCurso }; // Retornamos el objeto completo
+        },
+      });
+
+      if (isConfirmed && formValues) {
+        try {
+          // formValues.idCurso
+          // Llamar a crearCurso pasando el objeto completo y esperar la respuesta
+          console.log(formValues.idCurso);
+          await this.perfilService.insertCursoProfesor(formValues.idCurso);
+
+          Swal.fire("Éxito", "Curso asociado correctamente", "success");
+          this.cargarCursos(); // Recargar lista de cursos con el nuevo curso
+        } catch (error) {
+          console.error("Error al asociar el curso:", error);
+          Swal.fire(
+            "Error",
+            error.message || "No se pudo asociar al curso",
+            "error"
+          );
+        }
+      } else if (!isConfirmed) {
+        console.log("El usuario canceló la asociación del curso.");
       }
     },
 
@@ -700,6 +752,25 @@ export default {
 .botoncrearcurso:hover {
   border-color: #578e73 !important;
   background-color: #578e73 !important;
+  color: white;
+}
+
+.botonseleccionarcurso {
+  margin-left: 5px !important;
+  background-color: #2c717a !important; 
+  color: white;
+  cursor: pointer;
+}
+
+.botonseleccionarcurso:active {
+  border-color: #2c717a !important;
+  background-color: #2c717a !important;
+  color: white;
+}
+
+.botonseleccionarcurso:hover {
+  border-color: #2c717a !important;
+  background-color: #2c717a !important;
   color: white;
 }
 
