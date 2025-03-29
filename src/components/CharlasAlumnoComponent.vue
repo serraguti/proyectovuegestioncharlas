@@ -29,11 +29,24 @@
           <!-- Imagen de la charla -->
           <div class="card-img-container">
             <img
+              style="cursor: pointer;"
+              :id="'imagen' + charla.charla.idCharla"
               :src="charla.charla.imagenCharla || defaultImage"
               alt="Imagen charla"
               class="card-img"
+              title="Cambiar imagen"
               @error="onImageError"
+              @click="triggerFileInput(charla.charla.idCharla)"
             />
+            <input
+              :id="'fileCharla' + charla.charla.idCharla"
+              :data-idcharla="charla.charla.idCharla"
+              type="file"
+              ref="fileInput"
+              accept="image/*"
+              style="display: none"
+              @change="handleFileChange"
+            />            
             <!-- Estado de la charla (si lo hay) -->
             <div
               v-if="charla.charla.estadoCharla"
@@ -269,6 +282,39 @@ export default {
     };
   },
   methods: {
+    triggerFileInput(idCharla) {
+      var fileCharla = document.getElementById("fileCharla" + idCharla);
+      fileCharla.click();
+      //this.$refs.fileInput.click();
+    },
+    async handleFileChange(event) {
+      const file = event.target.files[0];
+      var charlaId = event.target.dataset.idcharla;
+      if (!file) return; // Si no se seleccionó archivo, salir
+      try {
+        const base64Content = await this.convertFileToBase64(file);
+        //console.log("listo");
+        await serviceCharlas.uploadCharlaImage(
+          charlaId,
+          file.name,
+          base64Content
+        );
+        var imagenCharla = document.getElementById("imagen" + charlaId);
+        this.defaultImage = URL.createObjectURL(file); // Actualiza la imagen mostrada
+        imagenCharla.src = this.defaultImage;
+      } catch (error) {
+        console.error("Error al subir la imagen:", error);
+        alert("No se pudo subir la imagen. Inténtalo de nuevo.");
+      }
+    },
+    convertFileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(",")[1]); // Solo el contenido base64
+        reader.onerror = (error) => reject(error);
+        reader.readAsDataURL(file);
+      });
+    },    
     cargarRecursos(idCharla) {
       serviceCharlas
         .getRecursosCharlas(idCharla)
@@ -363,15 +409,14 @@ export default {
     },
 
     editarCharla(charla) {
-  Swal.fire({
-    title: "Editar Charla",
-    html: `
+      Swal.fire({
+        title: "Editar Charla",
+        html: `
       <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
         <input id="swal-titulo" class="swal2-input" placeholder="Título" value="${charla.titulo}" style="width: 90%;">
         <textarea id="swaldescripcion" class="swal2-textarea" placeholder="Descripción" style="width: 90%; height: 120px;">${charla.descripcion}</textarea>
         <input id="swal-tiempo" type="number" class="swal2-input" placeholder="Tiempo (minutos)" value="${charla.tiempo}" style="width: 90%;">
         <input id="swal-fecha" type="datetime-local" class="swal2-input" value="${charla.fechaPropuesta}" style="width: 90%;">
-        <input id="swal-imagen" class="swal2-input" placeholder="URL Imagen" value="${charla.imagenCharla}" style="width: 90%;">
       </div>
     `,
     showCancelButton: true,
@@ -389,7 +434,7 @@ export default {
         idUsuario: charla.idUsuario,
         idEstadoCharla: charla.idEstadoCharla,
         idRonda: charla.idRonda,
-        imagenCharla: document.getElementById("swal-imagen").value,
+        imagenCharla: charla.imagenCharla,
       };
     },
   }).then((result) => {

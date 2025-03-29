@@ -369,6 +369,17 @@ export default {
       }
     },    
     async abrirModalseleccionarCurso() {
+        const cursosData = await this.perfilService.getAlumnosCursoProfesor();
+        const hayCursoActivo = cursosData.some((c) => c.curso.activo);
+
+        if (hayCursoActivo) {
+          Swal.fire(
+            "Error",
+            "Ya tienes un curso activo. Debes desactivarlo primero.",
+            "warning"
+          );
+          return;
+        }      
       //getCursosRoleProfesor
       //updateRoleCursoProfesor
       let html = '<select class="class="swal2-input" id="idCurso">';

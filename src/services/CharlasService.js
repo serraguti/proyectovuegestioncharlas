@@ -3,6 +3,30 @@ import { Global } from "@/Global";
 import Cookies from 'cookies-js';
 
 export default class CharlasService {
+    uploadCharlaImage(charlaId, fileName, fileContent) {
+        return new Promise((resolve, reject) => {
+            const endpoint = `api/Files/UploadImagenCharla/${charlaId}`;
+            const token = Cookies.get('bearer_token');
+
+            axios.post(Global.urlBase + endpoint, {
+                fileName,
+                fileContent,
+            }, {
+                headers: {
+                    Authorization: token,
+                    "Content-Type": "application/json",
+                },
+            })
+                .then(response => {
+                    resolve(response.data);
+                })
+                .catch(error => {
+                    console.error("Error al subir la imagen:", error.response ? error.response.data : error);
+                    reject(error);
+                });
+        });
+    } 
+
     getRondas() {
         return new Promise((resolve, reject) => {
             const endpoint = 'api/rondas/rondascursocomplete';
