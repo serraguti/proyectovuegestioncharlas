@@ -187,7 +187,7 @@ export default {
                 descripcionModulo: this.form.descripcionModulo,
                 fechaLimiteVotacion: formatearFecha(this.form.fechaLimiteVotacion),
             };
-            
+
             serviceCharlas.setRonda(rondaFormateada)
             .then(response => {
                 console.log('Charlas cargadas:', response);
